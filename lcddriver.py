@@ -1,8 +1,12 @@
+# Driver library for LCD display. Provided by Ryanteck LTD.
+# The procedures below can all be called in your own code!
+# You can just stick to the print string one though ;-)
+
 # This is the driver library for the LCD display
 # It contains some functions that you can call in your own program
 # Just remember that in order to use it you have to import it
 # You can do that with the line: import lcddriver
-# Mkae sure that lcddriver is in the same directory though!
+# Make sure that lcddriver is in the same directory though!
 # Credit for this code goes to "natbett" of the Raspberry Pi Forum 18/02/13
 
 import i2c_lib
