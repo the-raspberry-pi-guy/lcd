@@ -1,3 +1,4 @@
+# Simple string program. Writes and updates strings.
 # Demo program for the I2C 16x2 Display from Ryanteck.uk
 # Created by Matthew Timmons-Brown for The Raspberry Pi Guy YouTube channel
 
