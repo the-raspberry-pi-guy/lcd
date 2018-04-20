@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# Example: Scrolling text on display if the string is major than columns in display.
+# Example: Scrolling text on display if the string length is major than columns in display.
 # Created by Dídac García.
 
-# Import necessary libraries for comunication and display use
+# Import necessary libraries for communication and display use
 import lcddriver
 import time
 
