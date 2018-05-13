@@ -12,8 +12,13 @@
 import i2c_lib
 from time import *
 
-# LCD Address
+# LCD Address 
+# Usually you will have to use one of the two provided values below.
+# If you prefer, you can check your LCD address with the command: "sudo i2cdetect -y 1"
+# This is a common LCD address.
 ADDRESS = 0x27
+# This is another common LCD address.
+#ADDRESS = 0x3f
 
 # commands
 LCD_CLEARDISPLAY = 0x01
