@@ -5,6 +5,7 @@ You can buy one of these great little I2C LCD Displays for just £4.99 on ryante
 
 # Demo - Forex
 This is a demo developed by user and watcher bariskisir:
+
 ![demo_forex](demoGifs/demo_forex.gif)
 
 I haven't been able to test it myself personally, but it looks like a cool Forex stream. If you run into any bugs with it, please feel free to reach out to bariskisir and submit a PR.
