@@ -28,6 +28,6 @@ printf "dtparam=i2c_arm=1\n" >> /boot/config.txt
 
 
 echo "Should be now all finished. Please press any key to now reboot. After rebooting run"
-echo "'sudo python lcd.py' from this directory"
+echo "'sudo python demo_lcd.py' from this directory"
 read -n1 -s
 sudo reboot
