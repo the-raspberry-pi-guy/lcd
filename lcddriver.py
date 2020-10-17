@@ -9,10 +9,16 @@
 # Make sure that lcddriver is in the same directory though!
 # Credit for this code goes to "natbett" of the Raspberry Pi Forum 18/02/13
 
+# Backlight: Enhanced by TOMDENKT - backlight control (on/off)
+# If lcddriver.py is NOT in same folder with your scrpts,
+# set path to lcddriver IN YOUR script such as
+#import sys
+#sys.path.append("/home/pi/lcd") # example, path to lcddriver.py
+
 import i2c_lib
 from time import *
 
-# LCD Address 
+# LCD Address
 # Usually you will have to use one of the two provided values below.
 # If you prefer, you can check your LCD address with the command: "sudo i2cdetect -y 1"
 # This is a common LCD address.
@@ -116,3 +122,11 @@ class lcd:
    def lcd_clear(self):
       self.lcd_write(LCD_CLEARDISPLAY)
       self.lcd_write(LCD_RETURNHOME)
+
+   # backlight control (on/off)
+   # options: lcd_backlight(1) = ON, lcd_backlight(0) = OFF
+   def lcd_backlight(self, state):
+      if state == 1:
+         self.lcd_device.write_cmd(LCD_BACKLIGHT)
+      elif state == 0:
+         self.lcd_device.write_cmd(LCD_NOBACKLIGHT)
