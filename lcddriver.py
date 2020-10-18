@@ -10,7 +10,7 @@
 # Credit for this code goes to "natbett" of the Raspberry Pi Forum 18/02/13
 
 # Backlight: Enhanced by TOMDENKT - backlight control (on/off)
-# If lcddriver.py is NOT in same folder with your scrpts,
+# If lcddriver.py is NOT in same folder with your scripts,
 # set path to lcddriver IN YOUR script such as
 #import sys
 #sys.path.append("/home/pi/lcd") # example, path to lcddriver.py
