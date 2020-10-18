@@ -7,6 +7,10 @@
 # Backlight: display.lcd_backlight(0) # Turn backlight off
 # Backlight: display.lcd_backlight(1) # Turn backlight on
 
+# If lcddriver.py is NOT in same folder with your scripts,
+# uncomment below and set path to lcddriver, e.g. "/home/pi/lcd"
+#import sys
+#sys.path.append("/home/pi/lcd") # example, path to lcddriver.py
 
 # Import necessary libraries for communication and display use
 import lcddriver
