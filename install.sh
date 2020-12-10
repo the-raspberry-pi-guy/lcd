@@ -92,7 +92,7 @@ apt_install
 echo "Should now be installed, now checking revision."
 
 # global directory for the config files
-config_dir="installConfigs."
+config_dir="installConfigs"
 rpi_revision
 echo "I2C Library setup for this revision of Raspberry Pi. If you change revision, a modification will be required to i2c_lib.py."
 
