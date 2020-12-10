@@ -6,25 +6,26 @@ apt_install () {
 
 # find line that contains $1 from file $2 and delete it permanently
 delete_line () {
-  sed -i '/'"$1"'/d' "$2" 
+  sed -i '/'"$1"'/d' "$2" 2> /dev/null
 }
 
 # parse /boot/config.txt and append i2c config if missing
 i2c_boot_config () {
-  local line; local i2c_config='false'; local config='/boot/config.txt'
+  local config='/boot/config.txt'; local line; local i2c_reconfig='false'; local i2c_reconfig_line
   while read -r line; do
     if [[ "$line" =~ ^dtparam=i2c(_arm){0,1}(=on|=1){0,1}$ ]]; then
-      i2c_config='true'; break
+      i2c_reconfig='false'; break
     elif [[ "$line" =~ ^dtparam=i2c(_arm){0,1}(=off|=0){1}$ ]]; then
-      # backup config.txt
-      cp "$config" "$config".backup
-      # delete i2c=off config and append i2c=on config
-      delete_line "$line" "$config"
-      echo "dtparam=i2c" | tee -a "$config" > /dev/null
-      i2c_config='true'; break
+      i2c_reconfig='true'; i2c_reconfig_line="$line"; break
     fi
   done < "$config"
-  if [[ "$i2c_config" == 'false' ]]; then
+  if [[ "$i2c_reconfig" == 'true' ]]; then
+    # backup config.txt
+    cp "$config" "$config".backup
+    # delete i2c=off config and append i2c=on config
+    delete_line "$i2c_reconfig_line" "$config"
+    echo "dtparam=i2c" | tee -a "$config" > /dev/null
+  elif [[ "$i2c_reconfig" == 'false' ]]; then
     # backup config.txt
     cp "$config" "$config".backup
     # i2c config not found, append to file
@@ -97,7 +98,7 @@ echo "Automated Installer Program For I2C LCD Screens"
 echo "Installer by Ryanteck LTD. Cloned and tweaked by Matthew Timmons-Brown for The Raspberry Pi Guy YouTube tutorial"
 
 echo "Updating APT & Installing python-smbus, if password is asked by sudo please enter it"
-apt-install
+apt_install
 echo "Should now be installed, now checking revision"
 # global directory for the config files
 config_dir="installConfigs"
