@@ -12,7 +12,7 @@ apt-get install python-smbus -y
 echo "Should now be installed, now checking revision"
 revision=$(python -c "import RPi.GPIO as GPIO; print GPIO.RPI_REVISION")
 
-if [ $revision = "1" ]; then
+if [ "$revision" = "1" ]; then
   echo "I2C Pins detected as 0"
   cp installConfigs/i2c_lib_0.py ./i2c_lib.py
 else
