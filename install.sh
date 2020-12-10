@@ -21,9 +21,7 @@ i2c_boot_config () {
       # delete i2c=off config and append i2c=on config
       delete_line "$line" "$config"
       echo "dtparam=i2c" | tee -a "$config" > /dev/null
-      echo "append new line"
-      echo "break 3"; i2c_config='true'
-      break
+      i2c_config='true'; break
     fi
   done < "$config"
   if [[ "$i2c_config" == 'false' ]]; then
