@@ -1,7 +1,9 @@
 #!/bin/bash
 
 apt_install () {
+  echo '#######'
   apt update && apt install python-smbus -y
+  echo '#######'
 }
 
 # find line that contains $1 from file $2 and delete it permanently
@@ -44,30 +46,18 @@ line_to_list () {
   if [[ -z "$list" ]]; then return 1; fi
 }
 
-modules_load () {
-  #check /etc/modules
-  if [[ ! -f /etc/modules || -z $(cat /etc/modules) ]]; then
-    cp "$config_dir"/modules /etc/
+# takes path to an old modules file as first argument ($1) and a new file as second arg ($2).
+# it parses new and old files, appending missing modules to the old file instead of overwriting
+modules () {
+  if [[ -z "$1" || -z "$2" ]]; then return 1; fi
+  local old_file="$1"; local new_file="$2"
+  if [[ ! -f "$old_file" || -z $(cat "$old_file") ]]; then
+    cp "$new_file" "$old_file"
   else
-    if line_to_list "$config_dir"/modules; then
-      for mod in "${list[@]}"; do
-        if [[ ! "$(cat /etc/modules)" =~ $mod ]]; then
-          echo "$mod" | tee -a /etc/modules > /dev/null
-        fi
-      done
-    fi
-  fi
-}
-
-modules_blacklist () {
-  #check /etc/moddprobe.d/raspi-blacklist.conf
-  if [[ ! -f /etc/modprobe.d/raspi-blacklist.conf || -z $(cat /etc/modprobe.d/raspi-blacklist.conf) ]]; then
-    cp "$config_dir"/raspi-blacklist.conf /etc/modprobe.d/
-  else
-    if line_to_list "$config_dir"/raspi-blacklist.conf; then
-      for blacklisted in "${list[@]}"; do
-        if [[ ! "$(cat /etc/modprobe.d/raspi-blacklist.conf)" =~ $blacklisted ]]; then
-          echo "$blacklisted" | tee -a /etc/modprobe.d/raspi-blacklist.conf > /dev/null
+    if line_to_list "$new_file"; then
+      for m in "${list[@]}"; do
+        if [[ ! $(cat "$old_file") =~ $m ]]; then
+          echo "$m" | tee -a "$old_file" > /dev/null
         fi
       done
     fi
@@ -94,25 +84,28 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
-echo "Automated Installer Program For I2C LCD Screens"
-echo "Installer by Ryanteck LTD. Cloned and tweaked by Matthew Timmons-Brown for The Raspberry Pi Guy YouTube tutorial"
+echo "Automated Installer Program For I2C LCD Screens."
+echo "Installer by Ryanteck LTD. Cloned and tweaked by Matthew Timmons-Brown for The Raspberry Pi Guy YouTube tutorial. Edited by cgomesu."
 
-echo "Updating APT & Installing python-smbus, if password is asked by sudo please enter it"
+echo "Updating APT & Installing python-smbus, if password is asked by sudo please enter it."
 apt_install
-echo "Should now be installed, now checking revision"
+echo "Should now be installed, now checking revision."
+
 # global directory for the config files
-config_dir="installConfigs"
+config_dir="installConfigs."
 rpi_revision
-echo "I2C Library setup for this revision of Raspberry Pi. If you change revision, a modification will be required to i2c_lib.py"
+echo "I2C Library setup for this revision of Raspberry Pi. If you change revision, a modification will be required to i2c_lib.py."
 
-echo "Checking modules & blacklist. This will enable i2c Pins"
-modules_load
-modules_blacklist
+echo "Checking modules & blacklist. This will enable i2c Pins."
+#check modules
+modules /etc/modules "$config_dir"/modules
+#check raspi-blacklist.conf
+modules /etc/moddprobe.d/raspi-blacklist.conf "$config_dir"/raspi-blacklist.conf
 
-echo "Enabling i2c on boot"
+echo "Enabling i2c on boot."
 i2c_boot_config
 
-echo "Should be now all finished. Please press any key to now reboot. After rebooting run"
-echo "'sudo python demo_lcd.py' from this directory"
+echo "Should be now all finished. Please press any key to reboot now or Ctrl+C to abort."
+echo "After rebooting, run 'sudo python demo_lcd.py' from this directory."
 read -n1 -s
 sudo reboot
