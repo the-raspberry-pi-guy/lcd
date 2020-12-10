@@ -98,9 +98,15 @@ echo "I2C Library setup for this revision of Raspberry Pi. If you change revisio
 
 echo "Checking modules & blacklist. This will enable i2c Pins."
 #check modules
-modules /etc/modules "$config_dir"/modules
+if modules /etc/modules "$config_dir"/modules; then
+  echo "Updated required modules in /etc/modules."
+else
+  echo "There was an error while updating /etc/modules. i2c might not work."
+fi
 #check raspi-blacklist.conf
-modules /etc/moddprobe.d/raspi-blacklist.conf "$config_dir"/raspi-blacklist.conf
+if modules /etc/moddprobe.d/raspi-blacklist.conf "$config_dir"/raspi-blacklist.conf; then
+  echo "Updated required modules in /etc/moddprobe.d/raspi-blacklist.conf."
+fi
 
 echo "Enabling i2c on boot."
 i2c_boot_config
