@@ -13,7 +13,7 @@ delete_line () {
 
 # parse /boot/config.txt and append i2c config if missing
 i2c_boot_config () {
-  local config='/boot/config.txt'; local line; local i2c_reconfig='false'; local i2c_reconfig_line
+  local config='/boot/config.txt'; local line; local i2c_reconfig; local i2c_reconfig_line
   while read -r line; do
     if [[ "$line" =~ ^dtparam=i2c(_arm){0,1}(=on|=1){0,1}$ ]]; then
       i2c_reconfig='false'; break
@@ -27,7 +27,7 @@ i2c_boot_config () {
     # delete i2c=off config and append i2c=on config
     delete_line "$i2c_reconfig_line" "$config"
     echo "dtparam=i2c" | tee -a "$config" > /dev/null
-  elif [[ "$i2c_reconfig" == 'false' ]]; then
+  elif [[ -z "$i2c_reconfig" ]]; then
     # backup config.txt
     cp "$config" "$config".backup
     # i2c config not found, append to file
@@ -43,7 +43,7 @@ line_to_list () {
   while read -r line; do
     if [[ -n "$line" && ! "$line" =~ ^\# ]]; then list+=("$line"); fi
   done < "$file"
-  if [[ -z "$list" ]]; then return 1; fi
+  if [[ -z "${list[@]}" ]]; then return 1; fi
 }
 
 # takes path to an old modules file as first argument ($1) and a new file as second arg ($2).
