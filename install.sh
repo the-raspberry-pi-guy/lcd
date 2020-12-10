@@ -10,7 +10,7 @@ echo "Updating APT & Installing python-smbus, if password is asked by sudo pleas
 apt-get update
 apt-get install python-smbus -y
 echo "Should now be installed, now checking revision"
-revision=`python -c "import RPi.GPIO as GPIO; print GPIO.RPI_REVISION"`
+revision=$(python -c "import RPi.GPIO as GPIO; print GPIO.RPI_REVISION")
 
 if [ $revision = "1" ]; then
   echo "I2C Pins detected as 0"
