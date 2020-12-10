@@ -104,8 +104,8 @@ else
   echo "There was an error while updating /etc/modules. i2c might not work."
 fi
 #check raspi-blacklist.conf
-if modules /etc/moddprobe.d/raspi-blacklist.conf "$config_dir"/raspi-blacklist.conf; then
-  echo "Updated required modules in /etc/moddprobe.d/raspi-blacklist.conf."
+if modules /etc/modprobe.d/raspi-blacklist.conf "$config_dir"/raspi-blacklist.conf; then
+  echo "Updated required modules in /etc/modprobe.d/raspi-blacklist.conf."
 fi
 
 echo "Enabling i2c on boot."
