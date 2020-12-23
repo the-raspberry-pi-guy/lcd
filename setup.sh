@@ -1,9 +1,21 @@
 #!/usr/bin/env bash
 
+##########################################################################
+# Automated Installer Program For I2C 16x2 LCD Screens
+#
+# Cloned and adapted from: Ryanteck LTD
+#
+# Author: Matthew Timmons-Brown (the-raspberry-pi-guy)
+# Contributors: https://github.com/the-raspberry-pi-guy/lcd/contributors
+#
+# Repo: https://github.com/the-raspberry-pi-guy/lcd
+##########################################################################
+
+
 apt_install () {
-  echo '#######'
-  apt update && apt install python-smbus -y
-  echo '#######'
+  echo "####### APT #######"
+  apt update && apt install python-smbus i2c-tools -y
+  echo "###################"
 }
 
 # find line that contains $1 from file $2 and delete it permanently
@@ -64,17 +76,6 @@ modules () {
   fi
 }
 
-rpi_revision () {
-  revision=$(python -c "import RPi.GPIO as GPIO; print GPIO.RPI_REVISION")
-  if [[ "$revision" -eq 1 ]]; then
-    echo "I2C Pins detected as 0"
-    cp "$config_dir"/i2c_lib_0.py ./i2c_lib.py
-  else
-    echo "I2C Pins detected as 1"
-    cp "$config_dir"/i2c_lib_1.py ./i2c_lib.py
-  fi
-}
-
 
 ############
 # Main logic
@@ -82,34 +83,30 @@ rpi_revision () {
 # check again if user is root in case user is calling this script directly
 if [[ "$(id -u)" -ne 0 ]]; then echo "Please re-run as sudo."; exit 1; fi
 
-echo "Automated Installer Program For I2C LCD Screens."
-echo "Installer by Ryanteck LTD. Cloned and tweaked by Matthew Timmons-Brown for The Raspberry Pi Guy YouTube tutorial. Edited by cgomesu."
+echo "###################################################"
+echo "# Automated Installer Program For I2C LCD Screens #"
+echo "###################################################"
 
-echo "Updating APT & Installing python-smbus, if password is asked by sudo please enter it."
+echo "Updating apt pkg list and installing python-smbus. Enter the password if asked."
 apt_install
-echo "Should now be installed, now checking revision."
 
-# global directory for the config files
-config_dir="installConfigs"
-rpi_revision
-echo "I2C Library setup for this revision of Raspberry Pi. If you change revision, a modification will be required to i2c_lib.py."
-
-echo "Checking modules & blacklist. This will enable i2c Pins."
-#check modules
+config_dir="configs"  # global directory for the config files
+echo "Checking enabled and blacklisted modules."
 if modules /etc/modules "$config_dir"/modules; then
   echo "Updated required modules in /etc/modules."
 else
-  echo "There was an error while updating /etc/modules. i2c might not work."
+  echo "There was an error while updating /etc/modules. I2C might not work."
 fi
-#check raspi-blacklist.conf
 if modules /etc/modprobe.d/raspi-blacklist.conf "$config_dir"/raspi-blacklist.conf; then
   echo "Updated required modules in /etc/modprobe.d/raspi-blacklist.conf."
 fi
 
-echo "Enabling i2c on boot."
+echo "Enabling I2C on boot."
 i2c_boot_config
 
-echo "Should be now all finished. Please press any key to reboot now or Ctrl+C to abort."
-echo "After rebooting, run 'sudo python demo_lcd.py' from this directory."
+echo "#############################################################"
+echo "All finished! Press any key to REBOOT now or Ctrl+C to abort."
+echo "#############################################################"
+
 read -n1 -s
-sudo reboot
+reboot
