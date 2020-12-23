@@ -62,9 +62,8 @@ class I2CDevice:
             # try autodetect address, else use default if provided
             try:
                 self.addr = int('0x{}'.format(
-                    findall("[0-9a-z]{2}(?!:)", check_output(['/usr/sbin/i2cdetect', '-y', '1']))[0]), base=16) if exists(
-                    '/usr/sbin/i2cdetect') \
-                    else addr_default
+                    findall("[0-9a-z]{2}(?!:)", check_output(['/usr/sbin/i2cdetect', '-y', BUS_NUMBER]))[0]), base=16) \
+                    if exists('/usr/sbin/i2cdetect') else addr_default
             except:
                 self.addr = addr_default
         else:
