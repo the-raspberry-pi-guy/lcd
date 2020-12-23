@@ -1,7 +1,7 @@
 # LCD
-This repository contains all the code for interfacing with a **16x2 character I2C LCD display**. This accompanies my **Youtube tutorial**: [Raspberry Pi - Mini LCD Display Tutorial](https://www.youtube.com/watch?v=fR5XhHYzUK0). 
+This repository contains all the code for interfacing with a **16x2 character I2C liquid-crystal display (LCD)**. This accompanies my **Youtube tutorial**: [Raspberry Pi - Mini LCD Display Tutorial](https://www.youtube.com/watch?v=fR5XhHYzUK0). 
 
-You can buy one of these great little I2C LCD displays on eBay or somewhere like [the Pi Hut](https://thepihut.com/search?type=product&q=lcd).
+You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi Hut](https://thepihut.com/search?type=product&q=lcd).
 
 # Installation
 * Install git
@@ -46,7 +46,7 @@ This is a demo developed by user and watcher @bariskisir.  It requires `python-p
   ```
   pip install requests bs4
   ```
-* Now you should be able to run `demo_forex.py`
+* Now you should be able to run `demo_forex.py`:
 
 <p align="center">
   <img src="imgs/demo_forex.gif">
@@ -55,7 +55,7 @@ This is a demo developed by user and watcher @bariskisir.  It requires `python-p
 I haven't been able to test it myself personally, but it looks like a cool Forex stream. If you run into any bugs with it, please feel free to reach out to bariskisir and submit a PR.
 
 ## IP Address
-Another demo developed by Sierra007117:
+Another demo developed by @Sierra007117:
 
 <p align="center">
   <img src="imgs/demo_ip.jpg" width="640" height="480">
