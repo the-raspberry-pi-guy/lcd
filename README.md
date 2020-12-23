@@ -9,7 +9,11 @@ This is a demo developed by user and watcher Tomtom0201, showcasing backlight co
 ![demo_backlight](https://user-images.githubusercontent.com/67839253/96366971-4c953b80-114b-11eb-8b25-40ad8368d5db.gif)
 
 ## Demo - Forex
-This is a demo developed by user and watcher bariskisir:
+
+* Requires PIP (`sudo apt install python-pip`)
+* Then install `requests` and `bs4` (`pip install requests bs4`)
+
+This is a demo developed by user and watcher @bariskisir:
 
 ![demo_forex](demoGifs/demo_forex.gif)
 
