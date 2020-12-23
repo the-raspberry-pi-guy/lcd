@@ -52,7 +52,7 @@ I haven't been able to test it myself personally, but it looks like a cool Forex
 Another demo developed by Sierra007117:
 
 <p align="center">
-  <img src="imgs/demo_ip.jpg" style="width: 25%;">
+  <img src="imgs/demo_ip.jpg" width="640" height="480">
 </p>
 
 Display your Pi's IP address - useful for SSH'ing and more!
