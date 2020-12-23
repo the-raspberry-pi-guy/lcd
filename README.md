@@ -5,30 +5,29 @@ You can buy one of these great little I2C LCD displays on eBay or somewhere like
 
 # Installation
 * Install git
-``` 
-sudo apt install git
-```
+  ``` 
+  sudo apt install git
+  ```
 
 * Clone the repo in your `pi` home directory
-``` 
-cd /home/pi/
-git clone https://github.com/the-raspberry-pi-guy/lcd.git
-cd lcd/
-```
+  ``` 
+  cd /home/pi/
+  git clone https://github.com/the-raspberry-pi-guy/lcd.git
+  cd lcd/
+  ```
 
 * Run the automatic installation script with `sudo` permission
-``` 
-sudo ./install.sh
-```
+  ``` 
+  sudo ./install.sh
+  ```
 
 * After rebooting, try one of the [**demos**](#demos)
-``` 
-cd /home/pi/lcd/
-./demo_clock.py
-```
+  ``` 
+  cd /home/pi/lcd/
+  ./demo_clock.py
+  ```
 
 # Demos
-
 ## Backlight Control
 This is a demo developed by user and watcher @Tomtom0201, showcasing backlight control of the LCD (available on some hardware): 
 
@@ -37,10 +36,17 @@ This is a demo developed by user and watcher @Tomtom0201, showcasing backlight c
 </p>
 
 ## Forex
-* Requires PIP (`sudo apt install python-pip`)
-* Then install `requests` and `bs4` (`pip install requests bs4`)
+This is a demo developed by user and watcher @bariskisir.  It requires `python-pip` and the packages `requests` and `bs4` (BeautifulSoup) because it parses web content.
 
-This is a demo developed by user and watcher @bariskisir:
+* Install `pip`
+  ```
+  sudo apt install python-pip
+  ```
+* Then install `requests` and `bs4`
+  ```
+  pip install requests bs4
+  ```
+* Now you should be able to run `demo_forex.py`
 
 <p align="center">
   <img src="imgs/demo_forex.gif">
