@@ -1,41 +1,45 @@
 #! /usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-import lcddriver
+import drivers
 import time
 import requests 
 import datetime
-import locale
 import bs4
 
-display = lcddriver.lcd()
+display = drivers.Lcd()
 sleepSecond = 1
 minute = 60
 iteration = minute/sleepSecond
 
-selectedCurrencyList = ["USD/TRY","EUR/TRY","EUR/USD","GAU/TRY",u"BİST 100"]
+selectedCurrencyList = ["USD/TRY", "EUR/TRY", "EUR/USD", "GAU/TRY", u"BİST 100"]
 
 fakeHeaders = {
     'User-Agent': 'Google Chrome'
 }
 
+
 def GetTime():
     currentTime = datetime.datetime.now()
     return currentTime.strftime("%d.%m %a %H:%M")
 
+
 def PrintTime():
     display.lcd_display_string(GetTime(), 1)
-    
+
+
 def PrintCurrency(currency):
     display.lcd_display_string(currency, 2)
-    
+
+
 def PrintScreen(currency):
     display.lcd_clear()
     PrintTime()
     PrintCurrency(currency)
-    
+
+
 def GetCurrencyList():
-    htmlResponse = requests.get(url = "https://tr.investing.com/", headers = fakeHeaders)
+    htmlResponse = requests.get(url="https://tr.investing.com/", headers=fakeHeaders)
     html = htmlResponse.content
     parsedHtml = bs4.BeautifulSoup(html, features="html.parser")
     htmlCurrencyList = parsedHtml.findAll("tr", {"class": "LeftLiContainer"})
@@ -45,8 +49,8 @@ def GetCurrencyList():
         currencyValue = htmlCurrency.find("td", {"class": "lastNum"}).text
         if currencyName in selectedCurrencyList:
             currencyTextList.append(currencyName + " " + currencyValue)
-            
     return currencyTextList
+
 
 while True:
     try:
