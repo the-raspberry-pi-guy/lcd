@@ -41,7 +41,7 @@ def lcd_print(top=None, bottom=None, delay=5):
 def main():
     try:
         lcd_print(top="## Welcome to ##", bottom="## NetMonitor ##", delay=20)
-        lcd_print(top="## Who am I?? ##",
+        lcd_print(top="# Who am I?? #",
                   bottom="I am {0} at {1}".format(check_output(['hostname']).split()[0],
                                                   check_output(['hostname', '-I']).split()[0]),
                   delay=10)
@@ -50,7 +50,7 @@ def main():
                 lcd_print(top="# NetMonitor #",
                           bottom="{} is UP".format(host) if ping(address, 4) else "{} is DOWN".format(host))
     except KeyboardInterrupt:
-        end(' Signal to stop ', 0)
+        end('Signal to stop', 0)
 
 
 if __name__ == "__main__":
