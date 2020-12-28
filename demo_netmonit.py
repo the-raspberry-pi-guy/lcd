@@ -12,8 +12,8 @@ def cleanup():
 
 def end(msg=None, status=0):
     cleanup()
-    display.lcd_display_string("### Bye msg: ###", 1)
-    display.lcd_display_string(msg, 2)
+    display.lcd_display_string('{:^16}'.format('# Bye message: #'), 1)
+    display.lcd_display_string('{:^16}'.format(msg), 2)
     exit(status)
 
 
@@ -26,7 +26,7 @@ def ping(host, timeout):
 
 def lcd_print(top=None, bottom=None, delay=5):
     display.lcd_clear()
-    display.lcd_display_string(top, 1)
+    display.lcd_display_string('{:^16}'.format(top), 1)
     # scroll second line if more than 16 chars
     if len(bottom) > 16:
         display.lcd_display_string(bottom[:16], 2)
@@ -34,23 +34,23 @@ def lcd_print(top=None, bottom=None, delay=5):
             display.lcd_display_string(bottom[i:i+16], 2)
             sleep(0.5)
     else:
-        display.lcd_display_string(bottom, 2)
+        display.lcd_display_string('{:^16}'.format(bottom), 2)
     sleep(delay)
 
 
 def main():
-    lcd_print(top="## Welcome to ##", bottom="## NetMonitor ##", delay=20)
-    lcd_print(top="## Who am I?? ##",
-              bottom="I am {0} at {1}".format(check_output(['hostname']).split()[0],
-                                              check_output(['hostname', '-I']).split()[0]),
-              delay=10)
-    while True:
-        try:
+    try:
+        lcd_print(top="## Welcome to ##", bottom="## NetMonitor ##", delay=20)
+        lcd_print(top="## Who am I?? ##",
+                  bottom="I am {0} at {1}".format(check_output(['hostname']).split()[0],
+                                                  check_output(['hostname', '-I']).split()[0]),
+                  delay=10)
+        while True:
             for host, address in hosts.items():
-                lcd_print(top="## NetMonitor ##",
-                          bottom="{} is UP".format(host) if ping(address, 3) else "{} is DOWN".format(host))
-        except KeyboardInterrupt:
-            end(' Signal to stop ', 0)
+                lcd_print(top="# NetMonitor #",
+                          bottom="{} is UP".format(host) if ping(address, 4) else "{} is DOWN".format(host))
+    except KeyboardInterrupt:
+        end(' Signal to stop ', 0)
 
 
 if __name__ == "__main__":
@@ -59,9 +59,9 @@ if __name__ == "__main__":
     # customizable dict of unique, pingable hosts
     hosts = {
         'Internet': '8.8.8.8',
-        'Firewall': '192.168.10.1',
-        'NAS': '192.168.10.50',
-        'Cameras': '192.168.20.50',
-        'Plex': '192.168.30.50'
+        'Firewall': '192.168.1.1',
+        'NAS': '192.168.1.2',
+        'Cameras': '192.168.1.3',
+        'Plex': '192.168.1.4'
     }
     main()
