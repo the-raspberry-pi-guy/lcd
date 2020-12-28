@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+
+import drivers
+from time import sleep
+from os import devnull
+from subprocess import call, check_output
+
+
+def cleanup():
+    display.lcd_clear()
+
+
+def end(msg=None, status=0):
+    cleanup()
+    display.lcd_display_string("### Bye msg: ###", 1)
+    display.lcd_display_string(msg, 2)
+    exit(status)
+
+
+# Returns True if host responds to a ping request within the timeout interval
+def ping(host, timeout):
+    return call(['ping', '-c', '1', '-W', str(timeout), str(host)],
+                stdout=open(devnull, 'w'),
+                stdin=open(devnull, 'w')) == 0
+
+
+def lcd_print(top=None, bottom=None, delay=5):
+    display.lcd_clear()
+    display.lcd_display_string(top, 1)
+    # scroll second line if more than 16 chars
+    if len(bottom) > 16:
+        display.lcd_display_string(bottom[:16], 2)
+        for i in range(len(bottom) - 15):
+            display.lcd_display_string(bottom[i:i+16], 2)
+            sleep(0.5)
+    else:
+        display.lcd_display_string(bottom, 2)
+    sleep(delay)
+
+
+def main():
+    lcd_print(top="## Welcome to ##", bottom="## NetMonitor ##", delay=20)
+    lcd_print(top="## Who am I?? ##",
+              bottom="I am {0} at {1}".format(check_output(['hostname']).split()[0],
+                                              check_output(['hostname', '-I']).split()[0]),
+              delay=10)
+    while True:
+        try:
+            for host, address in hosts.items():
+                lcd_print(top="## NetMonitor ##",
+                          bottom="{} is UP".format(host) if ping(address, 3) else "{} is DOWN".format(host))
+        except KeyboardInterrupt:
+            end(' Signal to stop ', 0)
+
+
+if __name__ == "__main__":
+    # create a display object from the Lcd class
+    display = drivers.Lcd()
+    # customizable dict of unique, pingable hosts
+    hosts = {
+        'Internet': '8.8.8.8',
+        'Firewall': '192.168.10.1',
+        'NAS': '192.168.10.50',
+        'Cameras': '192.168.20.50',
+        'Plex': '192.168.30.50'
+    }
+    main()
