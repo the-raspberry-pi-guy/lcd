@@ -62,3 +62,25 @@ Another demo developed by @Sierra007117:
 </p>
 
 Display your Pi's IP address - useful for SSH'ing and more!
+
+
+## NetMonitor
+A demo created by @cgomesu that uses `ping` and `nc` (netcat) to monitor the network status of hosts and services, respectively.  This demo uses built-in tools, so nothing new needs to be installed.
+
+<p align="center">
+  <img src="imgs/demo_netmonitor.gif">
+</p>
+
+Hosts and services can be modified by editing their respective [dictionaries](https://docs.python.org/3/tutorial/datastructures.html#dictionaries):
+
+```python
+hosts = {
+    'Internet': '8.8.8.8',
+    'Firewall': '192.168.1.1',
+    'NAS': '192.168.1.2'
+}
+services = {
+    'Cameras': {'ip': '192.168.1.2', 'port': '8000'},
+    'Plex': {'ip': '192.168.1.2', 'port': '32400'}
+}
+```
