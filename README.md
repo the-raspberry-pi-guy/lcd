@@ -37,7 +37,9 @@ This is a demo developed by user @Tomtom0201, showing how simple text stings cou
 
 
 ## Extended strings
-This is a demo debeloped by @juvus, showing how extended strings could be used. Extended strings can contain special placeholders `{0xFF}` - hex code of the symbol wrapped with curly bracers. Hex code of the symbol can be found in characters table. For example code of the symbol `ö` is 0xEF, and so this symbol could be printed by using `{0xEF}` placeholder in string. Table can be found in `/imgs/characters_table.png`.   
+This is a demo debeloped by @juvus, showing how extended strings could be used. Extended strings can contain special placeholders `{0xFF}` - hex code of the symbol wrapped with curly bracers. Hex code of the symbol can be found in characters table. For example code of the symbol `ö` is 0xEF, and so this symbol could be printed by using `{0xEF}` placeholder in string. Table can be found in `/imgs/characters_table.png`.
+If you want to combine placeholder to write a symbol {0xFF} with native python placeholder {0} for inserting dome data into text, escape those placeholders that is using to write a symbol. This is an example:
+ `display.lcd_display_extended_string("Symbol:{{0xEF}} data:{0}".format(5), 2)` 
 
 <p align="center">
   <img src="imgs/demo_extended_strings.jpg" width="300">
