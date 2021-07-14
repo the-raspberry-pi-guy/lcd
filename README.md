@@ -28,6 +28,35 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
   ```
 
 # Demos
+## Simple strings
+This is a demo developed by user @Tomtom0201, showing how simple text stings could be displayed on LCD:
+
+<p align="center">
+  <img src="imgs/demo_simple_strings.jpg" width="640" height="480">
+</p>
+
+
+## Extended strings
+This is a demo debeloped by @juvus, showing how extended strings could be used. Extended strings can contain special placeholders `{0xFF}` - hex code of the symbol wrapped with curly bracers. Hex code of the symbol can be found in characters table. For example code of the symbol `ö` is 0xEF, and so this symbol could be printed by using `{0xEF}` placeholder in string. Table can be found in `/imgs/characters_table.png`.   
+
+<p align="center">
+  <img src="imgs/demo_extended_strings.jpg" width="640" height="480">
+</p>
+
+## Custom characters
+It is possible to define in CG RAM memory 8 absolutelly custom characters. This characters can be pronted on LCD the same way as any characters from the character table. Codes of the custom characters are unique and the following: 1st - {0x00}, 2nd - {0x01}, 3rd - {0x02}, 4th - {0x03}, 5th - {0x04}, 6th - {0x05}, 7th - {0x06} and 8th - {0x07}. Please, see the `demo_lcd_custom_characters.py` file for more details, how it is possible to define you own characters. This demo was debeloped by @juvus.
+
+<p align="center">
+  <img src="imgs/demo_custom_characters.jpg" width="640" height="480">
+</p>
+
+## Progress bar
+This is a demo of graphical progress bar created with custom characters. This bar could be used, for example, for showing the current level of battery charge. This demo was debeloped by @juvus.
+
+<p align="center">
+  <img src="imgs/demo_progress_bar.jpg" width="640" height="480">
+</p>
+
 ## Backlight Control
 This is a demo developed by user and watcher @Tomtom0201, showcasing backlight control of the LCD (available on some hardware): 
 
