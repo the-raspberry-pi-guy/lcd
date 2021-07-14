@@ -51,15 +51,19 @@ def GetCurrencyList():
             currencyTextList.append(currencyName + " " + currencyValue)
     return currencyTextList
 
-
-while True:
-    try:
+try:
+    while True:
         currencyList = GetCurrencyList()
-        for i in range(iteration/len(currencyList)):
-            for item in currencyList:
-                PrintScreen(item)
-                time.sleep(sleepSecond)
-    except:
-        display.lcd_clear()
-        PrintTime()
-        time.sleep(sleepSecond)
+        if currencyList:
+            for i in range(int(iteration/len(currencyList))):
+                for item in currencyList:
+                    PrintScreen(item)
+                    time.sleep(sleepSecond)
+        else:
+            display.lcd_clear()
+            PrintTime()
+            time.sleep(sleepSecond)
+
+except KeyboardInterrupt:
+    print("Cleaning up!")
+    display.lcd_clear()
