@@ -1,7 +1,7 @@
 from smbus import SMBus
 from RPi.GPIO import RPI_REVISION
 from time import sleep
-from re import findall
+from re import findall, match
 from subprocess import check_output
 from os.path import exists
 
@@ -54,7 +54,6 @@ LCD_NOBACKLIGHT = 0x00
 En = 0b00000100  # Enable bit
 Rw = 0b00000010  # Read/Write bit
 Rs = 0b00000001  # Register select bit
-
 
 class I2CDevice:
     def __init__(self, addr=None, addr_default=None, bus=BUS_NUMBER):
@@ -140,6 +139,28 @@ class Lcd:
         for char in string:
             self.lcd_write(ord(char), Rs)
 
+    # put extended string function. Extended string may contain placeholder like {0xFF} for 
+    # displaying the particular symbol from the symbol table
+    def lcd_display_extended_string(self, string, line):
+        if line == 1:
+            self.lcd_write(0x80)
+        if line == 2:
+            self.lcd_write(0xC0)
+        if line == 3:
+            self.lcd_write(0x94)
+        if line == 4:
+            self.lcd_write(0xD4)
+        # Process the string
+        while string:
+            # Trying to find pattern {0xFF} representing a symbol
+            result = match(r'\{0[xX][0-9a-fA-F]{2}\}', string)
+            if result:
+                self.lcd_write(int(result.group(0)[1:-1], 16), Rs)
+                string = string[6:]
+            else:
+                self.lcd_write(ord(string[0]), Rs)
+                string = string[1:]
+
     # clear lcd and set to home
     def lcd_clear(self):
         self.lcd_write(LCD_CLEARDISPLAY)
@@ -152,3 +173,99 @@ class Lcd:
             self.lcd.write_cmd(LCD_BACKLIGHT)
         elif state == 0:
             self.lcd.write_cmd(LCD_NOBACKLIGHT)
+
+class CustomCharacters:
+    def __init__(self, lcd):
+        self.lcd = lcd
+        # Data for custom character #1. Code {0x00}.
+        self.char_1_data = ["11111",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "11111"]
+        # Data for custom character #2. Code {0x01}
+        self.char_2_data = ["11111",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "11111"]
+        # Data for custom character #3. Code {0x02}
+        self.char_3_data = ["11111",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "11111"]
+        # Data for custom character #4. Code {0x03}
+        self.char_4_data = ["11111",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "11111"]
+        # Data for custom character #5. Code {0x04}
+        self.char_5_data = ["11111",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "11111"]
+        # Data for custom character #6. Code {0x05}
+        self.char_6_data = ["11111",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "11111"]
+        # Data for custom character #7. Code {0x06}
+        self.char_7_data = ["11111",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "11111"]
+        # Data for custom character #8. Code {0x07}
+        self.char_8_data = ["11111",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "10001",
+                            "11111"]
+
+    # load custom character data to CG RAM for later use in extended string. Data for  
+    # characters is hold in file custom_characters.txt in the same folder as i2c_dev.py 
+    # file. These custom characters can be used in printing of extended string with a 
+    # placeholder with desired character codes: 1st - {0x00}, 2nd - {0x01}, 3rd - {0x02},
+    # 4th - {0x03}, 5th - {0x04}, 6th - {0x05}, 7th - {0x06} and 8th - {0x07}.
+    def load_custom_characters_data(self):
+        self.chars_list = [self.char_1_data, self.char_2_data, self.char_3_data,
+                           self.char_4_data, self.char_5_data, self.char_6_data,
+                           self.char_7_data, self.char_8_data]
+
+        # commands to load character adress to RAM srarting from desired base adresses:
+        char_load_cmds = [0x40, 0x48, 0x50, 0x58, 0x60, 0x68, 0x70, 0x78]
+        for char_num in range(8):
+            # command to start loading data into CG RAM:
+            self.lcd.lcd_write(char_load_cmds[char_num])
+            for line_num in range(8):
+                line = self.chars_list[char_num][line_num]
+                binary_str_cmd = "0b000{0}".format(line)
+                self.lcd.lcd_write(int(binary_str_cmd, 2), Rs)
