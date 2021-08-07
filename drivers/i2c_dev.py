@@ -99,7 +99,8 @@ class I2CDevice:
 
 class Lcd:
     def __init__(self, addr=None):
-        self.lcd = I2CDevice(addr=addr, addr_default=0x27)
+        self.addr = addr
+        self.lcd = I2CDevice(addr=self.addr, addr_default=0x27)
         self.lcd_write(0x03)
         self.lcd_write(0x03)
         self.lcd_write(0x03)
