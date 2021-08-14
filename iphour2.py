@@ -39,8 +39,8 @@ def thread_get_theysaidso_qod():
         tss_quote_string=quote_json['contents']['quotes'][0]['quote'] + " - " + quote_json['contents']['quotes'][0]['author']
         time.sleep(1800)
 
-def get_dollar_conversion():
-    # get the 1 usd to cop conversion
+def thread_get_dollar_conversion():
+    ''' get the 1 usd to cop conversion '''
     pass
 
 def get_weather_info():
