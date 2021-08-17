@@ -13,6 +13,8 @@ display = drivers.Lcd()
 # Global variables go here
 api_tss_catlist_json=""
 tss_quote_string=""
+usd2cop_value=""
+weatherInfo_string=""
 
 ### HERE WE GET THE INFO WE NEED FROM EITHER THE SYSTEM OR THE APIS ###
 def thread_get_theysaidso_catlist():
@@ -40,12 +42,30 @@ def thread_get_theysaidso_qod():
         time.sleep(1800)
 
 def thread_get_dollar_conversion():
-    ''' get the 1 usd to cop conversion '''
-    pass
-
-def get_weather_info():
+    ''' get the 1 usd to cop conversion. Using free currency convert as first option, then ExchangeRate API as fallback. First updates every hour, the other one every day. However, we are prioritizing the first one. '''
+    while True:
+        try:
+            api_freeCurrConv_request=requests.get("https://free.currconv.com/api/v7/convert?q=USD_COP&compact=ultra&apiKey=a252cb255d5e022f74e3")
+            api_freeCurrConv_json=api_freeCurrConv_request.json()
+            global usd2cop_value
+            usd2cop_value=round(api_freeCurrConv_json['USD_COP'])
+            time.sleep(3600) 
+        except:
+            api_ExchangeRateAPI_request=requests.get("https://v6.exchangerate-api.com/v6/e737393710effa1bc6705aa0/pair/USD/COP")
+            api_ExchangeRateAPI_json=api_ExchangeRateAPI_request.json()
+            global usd2cop_value
+            usd2cop_value=round(api_ExchangeRateAPI_json['conversion_rate'])
+            time.sleep(3600) 
+        except:
+            global usd2cop_value="ERROR"
+            
+def thread_get_weather_info():
     # get the weather info for my city
-    pass
+    api_OpenWeather_request=requests.get('https://api.openweathermap.org/data/2.5/weather?q=Cali,co&units=metric&appid=9e85305f83b9cf3a5424d8a120072db7')
+    api_OpenWeather_json=api_OpenWeather_request.json()
+    global weatherInfo_string
+    weatherInfo_string=str(api_OpenWeather_json['main']['temp']) + "ºC - " + api_OpenWeather_json['weather'][0]['description'] + " - " + api_OpenWeather_json['name']
+    time.sleep(300)
 
 # the date
 today = date.today()
