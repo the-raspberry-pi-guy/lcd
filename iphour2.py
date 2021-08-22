@@ -111,12 +111,12 @@ def long_string(display, text='', num_line=2, num_cols=16):
     """
     if len(text) > num_cols:
         display.lcd_display_string(text[:num_cols], num_line)
-        sleep(1)
+        time.sleep(1)
         for i in range(len(text) - num_cols + 1):
             text_to_print = text[i:i+num_cols]
             display.lcd_display_string(text_to_print, num_line)
-            sleep(0.2)
-        sleep(1)
+            time.sleep(0.2)
+        time.sleep(1)
     else:
         display.lcd_display_string(text, num_line)
 
@@ -169,8 +169,8 @@ if __name__=="__main__":
     thr2_get_tssqod=threading.Thread(target=thread_get_theysaidso_qod, daemon=True)
     thr3_dollarconv=threading.Thread(target=thread_get_dollar_conversion, daemon=True)
     thr4_weatherinfo=threading.Thread(target=thread_get_weather_info, daemon=True)
-    # thr5_line1=threading.Thread(target=thread_line1, daemon=True)
-    # thr6_line2=threading.Thread(target=thread_line2, daemon=True)
+    thr5_line1=threading.Thread(target=thread_line1, daemon=True)
+    thr6_line2=threading.Thread(target=thread_line2, daemon=True)
     
     # Then we start the threads that populate the variables
     thr1_catlist.start()
@@ -192,14 +192,7 @@ if __name__=="__main__":
         print(disp_string_tss_quote)
         print(disp_string_usd2cop_value)
         print(disp_string_weatherInfo + "\n")
-'''
-    while disp_string_tss_quote == "" or disp_string_weatherInfo == "" or disp_string_usd2cop_value == "":
-        print("waiting info...")
-    else:
-        print(disp_string_tss_quote + "\n")
-        print(disp_string_usd2cop_value + "\n")
-        print(disp_string_weatherInfo + "\n")
-    
+
     # The display line 1 does not need api access, so we can start it right away
     # Before starting anything on line 2, we need to chech if the global variables are empty or not
     try:
@@ -207,13 +200,14 @@ if __name__=="__main__":
         thr5_line1.start()
 
         # thread to control line 2 goes here 
-        while disp_string_tss_quote == "" or disp_string_weatherInfo == "" or disp_string_usd2cop_value == "":
-            display.lcd_display_string("waiting info...", 2)
-        else:
-            thr6_line2.start()
+        thr6_line2.start()
+
+        # the script closes, let's see if this fixes it
+        while True:
+            pass
+            
 
 
     except KeyboardInterrupt:
         print("\nCleaning the display!")
         display.lcd_clear()
-'''
