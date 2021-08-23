@@ -39,7 +39,7 @@ def get_theysaidso_randomcat():
     global api_tss_catlist_json
     try:
         print("picking a random from these:\n")
-        print(api_tss_catlist_json)
+        print(api_tss_catlist_json['contents']['categories'])
         tss_list_cats=list(api_tss_catlist_json['contents']['categories'].items())
         random_category=random.choice(tss_list_cats)
         print("the random category is: " + random_category[0])
@@ -99,7 +99,7 @@ def thread_get_weather_info():
         api_OpenWeather_request=requests.get('https://api.openweathermap.org/data/2.5/weather?q=Cali,co&units=metric&appid=9e85305f83b9cf3a5424d8a120072db7')
         api_OpenWeather_json=api_OpenWeather_request.json()
         global disp_string_weatherInfo
-        disp_string_weatherInfo=str(api_OpenWeather_json['main']['temp']) + "ºC - " + api_OpenWeather_json['weather'][0]['description'] + " - " + api_OpenWeather_json['name']
+        disp_string_weatherInfo=str(round(api_OpenWeather_json['main']['temp'])) + "{0xCF}C - " + api_OpenWeather_json['weather'][0]['description'] + " - " + api_OpenWeather_json['name']
         print("thr4_weatherinfo got an update")
         time.sleep(300)
 
@@ -120,39 +120,6 @@ def long_string(display, text='', num_line=2, num_cols=16):
     else:
         display.lcd_display_string(text, num_line)
 
-def thread_line1():
-    ''' 
-    This is the function that controls the line 1 on the display
-    This function is also in charge of controlling the lcd_backlight.
-    '''
-    while True:
-        # the date
-        mytime=time.localtime()
-        
-        # Turn off the backlight from 0600 to 1800
-        if mytime.tm_hour>=6 and mytime.tm_hour<=18:
-            # turn off the backlight
-            display.lcd_backlight(0)
-        else:
-            # turn on the backlight
-            display.lcd_backlight(1)
-
-        # This shows the last 3 characters of our IP, the day and the month, and lastly the hour, a semicolon and the minutes.
-        my_ip = get_ip.get_ip()
-        display.lcd_display_string("i:" + my_ip[-3:] + " " + str(mytime.tm_mday).zfill(2) + str(mytime.tm_mon).zfill(2) + " " + str(mytime.tm_hour) + ":" + str(mytime.tm_min).zfill(2), 1)
-        time.sleep(1)
-
-def thread_line2():
-    ''' This is the function that controls the line 2 on the display. It will show the quote, the usd to cop conversion, and finally the weather info. '''
-    while True:
-        long_string(display, disp_string_tss_quote, 2)
-        time.sleep(1)
-        long_string(display, disp_string_weatherInfo, 2)
-        time.sleep(1)
-        long_string(display, disp_string_usd2cop_value, 2)
-        time.sleep(1)
-
-
 # the date (I dont think it´s necessary
 # today = date.today()
 
@@ -169,8 +136,6 @@ if __name__=="__main__":
     thr2_get_tssqod=threading.Thread(target=thread_get_theysaidso_qod, daemon=True)
     thr3_dollarconv=threading.Thread(target=thread_get_dollar_conversion, daemon=True)
     thr4_weatherinfo=threading.Thread(target=thread_get_weather_info, daemon=True)
-    thr5_line1=threading.Thread(target=thread_line1, daemon=True)
-    thr6_line2=threading.Thread(target=thread_line2, daemon=True)
     
     # Then we start the threads that populate the variables
     thr1_catlist.start()
@@ -196,16 +161,35 @@ if __name__=="__main__":
     # The display line 1 does not need api access, so we can start it right away
     # Before starting anything on line 2, we need to chech if the global variables are empty or not
     try:
-        # thread to control line 1 goes here 
-        thr5_line1.start()
-
-        # thread to control line 2 goes here 
-        thr6_line2.start()
-
         # the script closes, let's see if this fixes it
         while True:
-            pass
+            # the date
+            mytime=time.localtime()
             
+            # Turn off the backlight from 0600 to 1800
+            if mytime.tm_hour>=6 and mytime.tm_hour<=18:
+                # turn off the backlight
+                display.lcd_backlight(0)
+            else:
+                # turn on the backlight
+                display.lcd_backlight(1)
+
+            # This shows the last 3 characters of our IP, the day and the month, and lastly the hour, a semicolon and the minutes.
+            my_ip = get_ip.get_ip()
+            display.lcd_display_string("i:" + my_ip[-3:] + " " + str(mytime.tm_mday).zfill(2) + str(mytime.tm_mon).zfill(2) + " " + str(mytime.tm_hour) + ":" + str(mytime.tm_min).zfill(2), 1)
+            time.sleep(1)
+            
+            long_string(display, disp_string_tss_quote, 2)
+            time.sleep(1)
+            display.lcd_clear()
+            
+            long_string(display, disp_string_weatherInfo, 2)
+            time.sleep(1)
+            display.lcd_clear()
+
+            long_string(display, disp_string_usd2cop_value, 2)
+            time.sleep(2)
+            display.lcd_clear()
 
 
     except KeyboardInterrupt:
