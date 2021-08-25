@@ -38,11 +38,11 @@ def get_theysaidso_randomcat():
     '''
     global api_tss_catlist_json
     try:
-        print("picking a random from these:\n")
+        print("\npicking a random from these:")
         print(api_tss_catlist_json['contents']['categories'])
         tss_list_cats=list(api_tss_catlist_json['contents']['categories'].items())
         random_category=random.choice(tss_list_cats)
-        print("the random category is: " + random_category[0])
+        print("the random category is: " + random_category[0] + "\n")
         return random_category[0]
     except KeyError:
         print(api_tss_catlist_json['error']['message'])
@@ -52,6 +52,7 @@ def thread_get_theysaidso_qod():
     We create a base url with the space for the category.
     Then we format it and get a random category with get_theysaidso_randomcat.
     We then convert the response to json and return the string we need to display
+    We get a quote every half an hour
     '''
     tss_base_url="https://quotes.rest/qod?category={}"
     while True:
@@ -99,38 +100,46 @@ def thread_get_weather_info():
         api_OpenWeather_request=requests.get('https://api.openweathermap.org/data/2.5/weather?q=Cali,co&units=metric&appid=9e85305f83b9cf3a5424d8a120072db7')
         api_OpenWeather_json=api_OpenWeather_request.json()
         global disp_string_weatherInfo
-        disp_string_weatherInfo=str(round(api_OpenWeather_json['main']['temp'])) + "{0xCF}C - " + api_OpenWeather_json['weather'][0]['description'] + " - " + api_OpenWeather_json['name']
+        disp_string_weatherInfo=str(round(api_OpenWeather_json['main']['temp'])) + "C - " + api_OpenWeather_json['weather'][0]['description'] + " - " + api_OpenWeather_json['name']
         print("thr4_weatherinfo got an update")
         time.sleep(300)
 
 # Taken from the raspberry pi guy's sample, demo_scrollingtext.py
-def long_string(display, text='', num_line=2, num_cols=16):
+def long_string(display, text='', num_line=2, num_cols=16, speed=0.1):
     """ 
     Parameters: (driver, string to print, number of line to print, number of columns of your display)
     Return: This function send to display your scrolling string.
     """
     if len(text) > num_cols:
         display.lcd_display_string(text[:num_cols], num_line)
-        time.sleep(1)
+        time.sleep(3)
         for i in range(len(text) - num_cols + 1):
             text_to_print = text[i:i+num_cols]
             display.lcd_display_string(text_to_print, num_line)
-            time.sleep(0.2)
+            time.sleep(0.1)
         time.sleep(1)
     else:
         display.lcd_display_string(text, num_line)
 
-# the date (I dont think it´s necessary
-# today = date.today()
+def first_line():
+    '''
+    The instruction that displays the info in the first line.
+    I put it in this function to avoid repeating it. 
+    lcd_clear cleans the display so we need to repeat it.
+    '''
+    # the date
+    mytime=time.localtime()
+    
+    # This shows the last 3 characters of our IP, the day and the month, and lastly the hour, a semicolon and the minutes.
+    my_ip = get_ip.get_ip()
+    display.lcd_display_string("i:" + my_ip[-3:] + " " + str(mytime.tm_mday).zfill(2) + str(mytime.tm_mon).zfill(2) + " " + str(mytime.tm_hour) + ":" + str(mytime.tm_min).zfill(2), 1)
+
 
 print(dir(drivers))
 print(dir(drivers.Lcd))
 
 # CREATING AND CALLING THREADS STARTS HERE
 if __name__=="__main__":
-    
-    # POPULATE GLOBAL VARIABLES
-    
     # Start by declaring all these threads
     thr1_catlist=threading.Thread(target=thread_get_theysaidso_catlist, daemon=True)
     thr2_get_tssqod=threading.Thread(target=thread_get_theysaidso_qod, daemon=True)
@@ -146,11 +155,20 @@ if __name__=="__main__":
     else:
         thr2_get_tssqod.start()
 
-    thr3_dollarconv.start()
-    thr4_weatherinfo.start()
+    while disp_string_tss_quote == "":
+        # we wait for the quotes string to start the next thread
+        pass
+    else:
+        thr3_dollarconv.start()
+
+    while disp_string_usd2cop_value == "":
+        # we wait for the conversion variable to get populated to start the next thread
+        pass
+    else:
+        thr4_weatherinfo.start()
 
     # let's see what do we have
-    while disp_string_tss_quote == "" or disp_string_weatherInfo == "" or disp_string_usd2cop_value == "":
+    while disp_string_weatherInfo == "":
         pass
     else:
         print("\nINFO TO DISPLAY:")
@@ -158,39 +176,23 @@ if __name__=="__main__":
         print(disp_string_usd2cop_value)
         print(disp_string_weatherInfo + "\n")
 
-    # The display line 1 does not need api access, so we can start it right away
-    # Before starting anything on line 2, we need to chech if the global variables are empty or not
+    # THIS IS WHERE WE SEND THE INFO TO THE DISPLAY
     try:
-        # the script closes, let's see if this fixes it
         while True:
-            # the date
-            mytime=time.localtime()
-            
-            # Turn off the backlight from 0600 to 1800
-            if mytime.tm_hour>=6 and mytime.tm_hour<=18:
-                # turn off the backlight
-                display.lcd_backlight(0)
-            else:
-                # turn on the backlight
-                display.lcd_backlight(1)
-
-            # This shows the last 3 characters of our IP, the day and the month, and lastly the hour, a semicolon and the minutes.
-            my_ip = get_ip.get_ip()
-            display.lcd_display_string("i:" + my_ip[-3:] + " " + str(mytime.tm_mday).zfill(2) + str(mytime.tm_mon).zfill(2) + " " + str(mytime.tm_hour) + ":" + str(mytime.tm_min).zfill(2), 1)
-            time.sleep(1)
-            
+            first_line() 
             long_string(display, disp_string_tss_quote, 2)
-            time.sleep(1)
+            time.sleep(2)
             display.lcd_clear()
             
+            first_line() 
             long_string(display, disp_string_weatherInfo, 2)
-            time.sleep(1)
-            display.lcd_clear()
-
-            long_string(display, disp_string_usd2cop_value, 2)
             time.sleep(2)
             display.lcd_clear()
 
+            first_line() 
+            long_string(display, disp_string_usd2cop_value, 2)
+            time.sleep(4)
+            display.lcd_clear()
 
     except KeyboardInterrupt:
         print("\nCleaning the display!")
