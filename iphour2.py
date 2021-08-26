@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import drivers
 from datetime import date
 from datetime import time
@@ -7,11 +8,43 @@ import get_ip
 import threading
 import requests
 import random
+'''
+This is a script that takes info from some apis and shows it in the 16*2 display.
+It uses the following apis:
+
+THEYSAIDSO.COM
+Free public API that provides famous quotes from well known people.
+
+EXCHANGERATE-API.COM / FREE.CURRCONV.COM
+There are a lot of currency apis but these ones offer free currency exchange info
+
+OPENWEATHERMAP.ORG
+Weather info, forecasts, etc.
+
+It also shows the last three characters from your ip address, the date in DDMM format
+and the hour in HH:MM format
+'''
+
+#------------------------------USER VARIABLES---------------------------------------
+
+# Get your api tokens from each site, then put them here. At the time of coding, 
+# theysaidso can be freely used without the need of a token, given we respect their restrictions.
+# api_OpenWeather_yourCity Search for your city in openweathermap.org, then put the <city,country> code here with no space in between.
+api_OpenWeather_token="9e85305f83b9cf3a5424d8a120072db7"
+api_OpenWeather_yourCity="Cali,co"
+api_freeCurrConv_token="a252cb255d5e022f74e3"
+api_ExchangeRateAPI_token="e737393710effa1bc6705aa0"
+
+# Put the currency pair here to see the exchange rate. An amount of 1 curr1 will be converted to curr2
+curr1="USD"
+curr2="COP"
+
+#------------NOTHING ELSE NEEDS TO BE CHANGED BEYOND THIS POINT---------------------
 
 # start the lcd driver
 display = drivers.Lcd()
 
-# Global variables go here
+# Global variables go here. These store the info from the apis that we want to display. Do not put anything here.
 api_tss_catlist_json=""
 disp_string_tss_quote=""
 disp_string_usd2cop_value=""
@@ -63,7 +96,7 @@ def thread_get_theysaidso_qod():
         print("thr2_get_tssqod got a quote update")
         time.sleep(1800)
 
-def thread_get_dollar_conversion():
+def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=api_freeCurrConv_token, c1=curr1, c2=curr2):
     ''' 
     This thread gets the 1 usd to cop conversion. 
     Using ExchangeRate API (ERA) as first option. 
@@ -76,15 +109,18 @@ def thread_get_dollar_conversion():
     while True:
         global disp_string_usd2cop_value
         try:
-            api_ExchangeRateAPI_request=requests.get("https://v6.exchangerate-api.com/v6/e737393710effa1bc6705aa0/pair/USD/COP")
+            base_url="https://v6.exchangerate-api.com/v6/{}/pair/{}/{}"
+            api_ExchangeRateAPI_request=requests.get(base_url.format(tokenERA, c1, c2))
             api_ExchangeRateAPI_json=api_ExchangeRateAPI_request.json()
-            disp_string_usd2cop_value="1USD:" + str(round(api_ExchangeRateAPI_json['conversion_rate'])) + "COP"
+            disp_string_usd2cop_value="1"+ c1 + ":" + str(round(api_ExchangeRateAPI_json['conversion_rate'])) + c2
             print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA")
             time.sleep(86400) 
         except:
-            api_freeCurrConv_request=requests.get("https://free.currconv.com/api/v7/convert?q=USD_COP&compact=ultra&apiKey=a252cb255d5e022f74e3")
+            base_url="https://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}"
+            api_freeCurrConv_request=requests.get(base_url.format(c1, c2, tokenFCC))
             api_freeCurrConv_json=api_freeCurrConv_request.json()
-            disp_string_usd2cop_value="1USD:" + str(round(api_freeCurrConv_json['USD_COP'])) + "COP"
+            fcc_rate= c1 + "_" + c2
+            disp_string_usd2cop_value="1" + c1 + ":" + str(round(api_freeCurrConv_json[fcc_rate])) + c2
             print(str(datetime.now()) + " " + "thr3_dollarconv got an update from FCC")
             time.sleep(3600) 
         finally:
@@ -92,12 +128,13 @@ def thread_get_dollar_conversion():
             # disp_string_usd2cop_value="ERROR"
             # We have to find the possible errors that can happen. Remember the "finally:" section always runs, so putting ERROR in the variable is not appropriate
             
-def thread_get_weather_info():
+def thread_get_weather_info(tokenOWM=api_OpenWeather_token, cityid=api_OpenWeather_yourCity):
     '''
     get the weather info for my city
     '''
     while True:
-        api_OpenWeather_request=requests.get('https://api.openweathermap.org/data/2.5/weather?q=Cali,co&units=metric&appid=9e85305f83b9cf3a5424d8a120072db7')
+        base_url='https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid={}'
+        api_OpenWeather_request=requests.get(base_url.format(cityid, tokenOWM))
         api_OpenWeather_json=api_OpenWeather_request.json()
         global disp_string_weatherInfo
         disp_string_weatherInfo=str(round(api_OpenWeather_json['main']['temp'])) + "C - " + api_OpenWeather_json['weather'][0]['description'] + " - " + api_OpenWeather_json['name']
@@ -116,7 +153,7 @@ def long_string(display, text='', num_line=2, num_cols=16, speed=0.1):
         for i in range(len(text) - num_cols + 1):
             text_to_print = text[i:i+num_cols]
             display.lcd_display_string(text_to_print, num_line)
-            time.sleep(0.1)
+            time.sleep(speed)
         time.sleep(1)
     else:
         display.lcd_display_string(text, num_line)
