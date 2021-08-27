@@ -109,13 +109,6 @@ def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=ap
     while True:
         global disp_string_usd2cop_value
         try:
-            base_url="https://v6.exchangerate-api.com/v6/{}/pair/{}/{}"
-            api_ExchangeRateAPI_request=requests.get(base_url.format(tokenERA, c1, c2))
-            api_ExchangeRateAPI_json=api_ExchangeRateAPI_request.json()
-            disp_string_usd2cop_value="1"+ c1 + ":" + str(round(api_ExchangeRateAPI_json['conversion_rate'])) + c2
-            print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA")
-            time.sleep(86400) 
-        except:
             base_url="https://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}"
             api_freeCurrConv_request=requests.get(base_url.format(c1, c2, tokenFCC))
             api_freeCurrConv_json=api_freeCurrConv_request.json()
@@ -123,6 +116,13 @@ def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=ap
             disp_string_usd2cop_value="1" + c1 + ":" + str(round(api_freeCurrConv_json[fcc_rate])) + c2
             print(str(datetime.now()) + " " + "thr3_dollarconv got an update from FCC")
             time.sleep(3600) 
+        except:
+            base_url="https://v6.exchangerate-api.com/v6/{}/pair/{}/{}"
+            api_ExchangeRateAPI_request=requests.get(base_url.format(tokenERA, c1, c2))
+            api_ExchangeRateAPI_json=api_ExchangeRateAPI_request.json()
+            disp_string_usd2cop_value="1"+ c1 + ":" + str(round(api_ExchangeRateAPI_json['conversion_rate'])) + c2
+            print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA")
+            time.sleep(86400) 
         finally:
             pass
             # disp_string_usd2cop_value="ERROR"
