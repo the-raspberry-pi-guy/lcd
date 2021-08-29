@@ -29,13 +29,14 @@ and the hour in HH:MM format
 
 # Get your api tokens from each site, then put them here. At the time of coding, 
 # theysaidso can be freely used without the need of a token, given we respect their restrictions.
-# api_OpenWeather_yourCity Search for your city in openweathermap.org, then put the <city,country> code here with no space in between.
+# api_OpenWeather_yourCity : Search for your city in openweathermap.org, then put the <city,country> code here with no space in between.
 api_OpenWeather_token="9e85305f83b9cf3a5424d8a120072db7"
 api_OpenWeather_yourCity="Cali,co"
 api_freeCurrConv_token="a252cb255d5e022f74e3"
 api_ExchangeRateAPI_token="e737393710effa1bc6705aa0"
 
 # Put the currency pair here to see the exchange rate. An amount of 1 curr1 will be converted to curr2
+# refer to each api for the list of supported apis
 curr1="USD"
 curr2="COP"
 
@@ -61,7 +62,7 @@ def thread_get_theysaidso_catlist():
         api_tss_catlist_req=requests.get("http://quotes.rest/qod/categories.json") # get the category list
         global api_tss_catlist_json
         api_tss_catlist_json=api_tss_catlist_req.json() # convert it to json
-        print("thr1_catlist got a category list update")
+        print(str(datetime.now()) + " " + "thr1_catlist got a category list update")
         time.sleep(172800) # sleep for 48 hours since it does not update that often
 
 def get_theysaidso_randomcat():
@@ -71,14 +72,14 @@ def get_theysaidso_randomcat():
     '''
     global api_tss_catlist_json
     try:
-        print("\npicking a random from these:")
-        print(api_tss_catlist_json['contents']['categories'])
+        print("\n" + str(datetime.now()) + " picking a random from these:\n" + str(api_tss_catlist_json['contents']['categories']))
         tss_list_cats=list(api_tss_catlist_json['contents']['categories'].items())
         random_category=random.choice(tss_list_cats)
-        print("the random category is: " + random_category[0] + "\n")
+        print(str(datetime.now()) + " " + "the random category is: " + random_category[0] + "\n")
         return random_category[0]
     except KeyError:
         print(api_tss_catlist_json['error']['message'])
+        # to do: got an error so the quote string should show something about it
 
 def thread_get_theysaidso_qod():
     '''
@@ -89,12 +90,15 @@ def thread_get_theysaidso_qod():
     '''
     tss_base_url="https://quotes.rest/qod?category={}"
     while True:
-        api_tss_quote_request=requests.get(tss_base_url.format(get_theysaidso_randomcat()))
-        quote_json=api_tss_quote_request.json()
         global disp_string_tss_quote
-        disp_string_tss_quote=quote_json['contents']['quotes'][0]['quote'] + " - " + quote_json['contents']['quotes'][0]['author']
-        print("thr2_get_tssqod got a quote update")
-        time.sleep(1800)
+        try:
+            api_tss_quote_request=requests.get(tss_base_url.format(get_theysaidso_randomcat()))
+            quote_json=api_tss_quote_request.json()
+            disp_string_tss_quote=quote_json['contents']['quotes'][0]['quote'] + " - " + quote_json['contents']['quotes'][0]['author']
+            print(str(datetime.now()) + " " + "thr2_get_tssqod got a quote update:\n" + "\t\t" + disp_string_tss_quote)
+            time.sleep(1800)
+        except KeyError:
+            disp_string_tss_quote=api_tss_catlist_json['error']['message']
 
 def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=api_freeCurrConv_token, c1=curr1, c2=curr2):
     ''' 
@@ -105,7 +109,7 @@ def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=ap
     ERA updates once every day. 
     We are prioritizing ERA over FCC. 
     '''
-    print(str(datetime.now()) + " " + "debug: starting the usd2cop request")
+    print(str(datetime.now()) + " " + "starting the currency conversion request")
     while True:
         global disp_string_usd2cop_value
         try:
@@ -114,14 +118,14 @@ def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=ap
             api_freeCurrConv_json=api_freeCurrConv_request.json()
             fcc_rate= c1 + "_" + c2
             disp_string_usd2cop_value="1" + c1 + ":" + str(round(api_freeCurrConv_json[fcc_rate])) + c2
-            print(str(datetime.now()) + " " + "thr3_dollarconv got an update from FCC")
+            print(str(datetime.now()) + " " + "thr3_dollarconv got an update from FCC: " + disp_string_usd2cop_value)
             time.sleep(3600) 
         except:
             base_url="https://v6.exchangerate-api.com/v6/{}/pair/{}/{}"
             api_ExchangeRateAPI_request=requests.get(base_url.format(tokenERA, c1, c2))
             api_ExchangeRateAPI_json=api_ExchangeRateAPI_request.json()
             disp_string_usd2cop_value="1"+ c1 + ":" + str(round(api_ExchangeRateAPI_json['conversion_rate'])) + c2
-            print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA")
+            print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA: " + disp_string_usd2cop_value)
             time.sleep(86400) 
         finally:
             pass
@@ -138,7 +142,7 @@ def thread_get_weather_info(tokenOWM=api_OpenWeather_token, cityid=api_OpenWeath
         api_OpenWeather_json=api_OpenWeather_request.json()
         global disp_string_weatherInfo
         disp_string_weatherInfo=str(round(api_OpenWeather_json['main']['temp'])) + "C - " + api_OpenWeather_json['weather'][0]['description'] + " - " + api_OpenWeather_json['name']
-        print("thr4_weatherinfo got an update")
+        print(str(datetime.now()) + " " + "thr4_weatherinfo got an update: " + disp_string_weatherInfo)
         time.sleep(300)
 
 # Taken from the raspberry pi guy's sample, demo_scrollingtext.py
@@ -172,8 +176,9 @@ def first_line():
     display.lcd_display_string("i:" + my_ip[-3:] + " " + str(mytime.tm_mday).zfill(2) + str(mytime.tm_mon).zfill(2) + " " + str(mytime.tm_hour) + ":" + str(mytime.tm_min).zfill(2), 1)
 
 
-print(dir(drivers))
-print(dir(drivers.Lcd))
+# print(dir(drivers))
+# print(dir(drivers.Lcd))
+print("\nRPi APIS INFO FOR 16X2 DISPLAY. Version a.00\n")
 
 # CREATING AND CALLING THREADS STARTS HERE
 if __name__=="__main__":
@@ -208,10 +213,7 @@ if __name__=="__main__":
     while disp_string_weatherInfo == "":
         pass
     else:
-        print("\nINFO TO DISPLAY:")
-        print(disp_string_tss_quote)
-        print(disp_string_usd2cop_value)
-        print(disp_string_weatherInfo + "\n")
+        print("\nSENDING INITIAL INFO TO DISPLAY")
 
     # THIS IS WHERE WE SEND THE INFO TO THE DISPLAY
     try:
