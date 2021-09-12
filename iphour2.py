@@ -60,14 +60,18 @@ def thread_get_theysaidso_catlist():
     '''
     while True:
         api_tss_catlist_req=requests.get("http://quotes.rest/qod/categories.json") # get the category list
+        print("thr1_catlist got response code: " + str(api_tss_catlist_req.status_code))
         global api_tss_catlist_json
         api_tss_catlist_json=api_tss_catlist_req.json() # convert it to json
         print(str(datetime.now()) + " " + "thr1_catlist got a category list update")
         time.sleep(172800) # sleep for 48 hours since it does not update that often
 
+        # need to handle exceptions for this! what happens if the api limit is exceeded?
+
 def get_theysaidso_randomcat():
     '''
     Function that picks a random category from the category list
+    It requires api_tss_catlist_json to be already populated 
     It is used by the thread_get_theysaidso_qod
     '''
     global api_tss_catlist_json
@@ -78,7 +82,7 @@ def get_theysaidso_randomcat():
         print(str(datetime.now()) + " " + "the random category is: " + random_category[0] + "\n")
         return random_category[0]
     except KeyError:
-        print(api_tss_catlist_json['error']['message'])
+        print(str(datetime.now()) + api_tss_catlist_json['error']['message'])
         # to do: got an error so the quote string should show something about it
 
 def thread_get_theysaidso_qod():
@@ -93,12 +97,23 @@ def thread_get_theysaidso_qod():
         global disp_string_tss_quote
         try:
             api_tss_quote_request=requests.get(tss_base_url.format(get_theysaidso_randomcat()))
+            print("thr2_get_tssqod got response code: " + str(api_tss_quote_request.status_code))
             quote_json=api_tss_quote_request.json()
             disp_string_tss_quote=quote_json['contents']['quotes'][0]['quote'] + " - " + quote_json['contents']['quotes'][0]['author']
             print(str(datetime.now()) + " " + "thr2_get_tssqod got a quote update:\n" + "\t\t" + disp_string_tss_quote)
-            time.sleep(1800)
+            time.sleep(2700)
         except KeyError:
-            disp_string_tss_quote=api_tss_catlist_json['error']['message']
+            disp_string_tss_quote=quote_json['error']['message']
+            print(str(datetime.now()) + " " + "thr2_get_tssqod got an API error:\n" + "\t\t" + disp_string_tss_quote)
+            time.sleep(300)
+        except ConnectionError:
+            disp_string_tss_quote="Connection Error while getting the quote. Will try again in 10 seconds."
+            print(str(datetime.now()) + " " + "thr2_get_tssqod got a ConnectionError. will try again in 10 seconds.")
+            time.sleep(10)
+        except ValueError:
+            disp_string_tss_quote="JSON Decode Error while getting the quote. Will try again in 20 seconds."
+            print(str(datetime.now()) + " " + "thr2_get_tssqod got a ValueError. will try again in 20 seconds.")
+            time.sleep(20)
 
 def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=api_freeCurrConv_token, c1=curr1, c2=curr2):
     ''' 
@@ -120,30 +135,53 @@ def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=ap
             disp_string_usd2cop_value="1" + c1 + ":" + str(round(api_freeCurrConv_json[fcc_rate])) + c2
             print(str(datetime.now()) + " " + "thr3_dollarconv got an update from FCC: " + disp_string_usd2cop_value)
             time.sleep(3600) 
-        except:
+        except (ConnectionError, KeyError, ValueError) as e:
             base_url="https://v6.exchangerate-api.com/v6/{}/pair/{}/{}"
             api_ExchangeRateAPI_request=requests.get(base_url.format(tokenERA, c1, c2))
             api_ExchangeRateAPI_json=api_ExchangeRateAPI_request.json()
             disp_string_usd2cop_value="1"+ c1 + ":" + str(round(api_ExchangeRateAPI_json['conversion_rate'])) + c2
             print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA: " + disp_string_usd2cop_value)
             time.sleep(86400) 
-        finally:
-            pass
-            # disp_string_usd2cop_value="ERROR"
-            # We have to find the possible errors that can happen. Remember the "finally:" section always runs, so putting ERROR in the variable is not appropriate
+        except KeyError:
+            disp_string_usd2cop_value="JSON Key error on exchange rate response. Check log. Retrying in 5 min."
+            print(str(datetime.now()) + " thr3_dollarconv got an API error. \nFCC:" + str(api_freeCurrConv_json) + "\nERA:" + str(api_ExchangeRateAPI_json))
+            time.sleep(300)
+        except ConnectionError:
+            disp_string_usd2cop_value="Connection Error while getting the exchange rate. Will try again in 10 seconds."
+            print(str(datetime.now()) + " thr3_dollarconv got a ConnectionError. will try again in 10 seconds.")
+            time.sleep(10)
+        except ValueError:
+            disp_string_usd2cop_value="JSON Decode Error while getting the exchange rate. Will try again in 20 seconds."
+            print(str(datetime.now()) + " thr3_dollarconv got a ValueError. will try again in 20 seconds.")
+            time.sleep(20)
+
+            # We have to find the possible errors that can happen.
             
 def thread_get_weather_info(tokenOWM=api_OpenWeather_token, cityid=api_OpenWeather_yourCity):
     '''
     get the weather info for my city
     '''
+    global disp_string_weatherInfo
     while True:
-        base_url='https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid={}'
-        api_OpenWeather_request=requests.get(base_url.format(cityid, tokenOWM))
-        api_OpenWeather_json=api_OpenWeather_request.json()
-        global disp_string_weatherInfo
-        disp_string_weatherInfo=str(round(api_OpenWeather_json['main']['temp'])) + "C - " + api_OpenWeather_json['weather'][0]['description'] + " - " + api_OpenWeather_json['name']
-        print(str(datetime.now()) + " " + "thr4_weatherinfo got an update: " + disp_string_weatherInfo)
-        time.sleep(300)
+        try:
+            base_url='https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid={}'
+            api_OpenWeather_request=requests.get(base_url.format(cityid, tokenOWM))
+            api_OpenWeather_json=api_OpenWeather_request.json()
+            disp_string_weatherInfo=str(round(api_OpenWeather_json['main']['temp'])) + "C - " + api_OpenWeather_json['weather'][0]['description'] + " - " + api_OpenWeather_json['name']
+            print(str(datetime.now()) + " " + "thr4_weatherinfo got an update: " + disp_string_weatherInfo)
+            time.sleep(360)
+        except KeyError:
+            disp_string_weatherInfo="JSON Key error on weather info response. Check log. Retrying in 5 min."
+            print(str(datetime.now()) + " thr4_weatherinfo got an API error. \n" + str(api_OpenWeather_json))
+            time.sleep(360)
+        except ConnectionError:
+            disp_string_weatherInfo="Connection Error while getting the weather info. Will try again in 10 seconds."
+            print(str(datetime.now()) + " thr4_weatherinfo got a ConnectionError. will try again in 10 seconds.")
+            time.sleep(10)
+        except ValueError:
+            disp_string_weatherInfo="JSON Decode Error while getting the weather info. Will try again in 20 seconds."
+            print(str(datetime.now()) + " thr4_weatherinfo got a ValueError. will try again in 20 seconds.")
+            time.sleep(20)
 
 # Taken from the raspberry pi guy's sample, demo_scrollingtext.py
 def long_string(display, text='', num_line=2, num_cols=16, speed=0.1):
