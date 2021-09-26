@@ -167,9 +167,9 @@ def thread_get_weather_info(tokenOWM=api_OpenWeather_token, cityid=api_OpenWeath
             base_url='https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid={}'
             api_OpenWeather_request=requests.get(base_url.format(cityid, tokenOWM))
             api_OpenWeather_json=api_OpenWeather_request.json()
-            disp_string_weatherInfo=str(round(api_OpenWeather_json['main']['temp'])) + "C - " + api_OpenWeather_json['weather'][0]['description'] + " - " + api_OpenWeather_json['name']
+            disp_string_weatherInfo=str(round(api_OpenWeather_json['main']['temp'])) + "￟C - " + api_OpenWeather_json['weather'][0]['description'] + " - " + api_OpenWeather_json['name']
             print(str(datetime.now()) + " " + "thr4_weatherinfo got an update: " + disp_string_weatherInfo)
-            time.sleep(360)
+            time.sleep(600)
         except KeyError:
             disp_string_weatherInfo="JSON Key error on weather info response. Check log. Retrying in 5 min."
             print(str(datetime.now()) + " thr4_weatherinfo got an API error. \n" + str(api_OpenWeather_json))
