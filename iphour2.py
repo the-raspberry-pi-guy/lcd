@@ -4,10 +4,10 @@ from datetime import date
 from datetime import time
 from datetime import datetime
 import time
-import get_ip
 import threading
 import requests
 import random
+import socket
 '''
 This is a script that takes info from some apis and shows it in the 16*2 display.
 It uses the following apis:
@@ -27,18 +27,19 @@ and the hour in HH:MM format
 
 #------------------------------USER VARIABLES---------------------------------------
 
-# Get your api tokens from each site, then put them here. At the time of coding, 
+# Get your api tokens from each site, then put them here, between the quotes. At the time of coding, 
 # theysaidso can be freely used without the need of a token, given we respect their restrictions.
+api_OpenWeather_token=""
+api_freeCurrConv_token=""
+api_ExchangeRateAPI_token=""
+
 # api_OpenWeather_yourCity : Search for your city in openweathermap.org, then put the <city,country> code here with no space in between.
-api_OpenWeather_token="9e85305f83b9cf3a5424d8a120072db7"
-api_OpenWeather_yourCity="Cali,co"
-api_freeCurrConv_token="a252cb255d5e022f74e3"
-api_ExchangeRateAPI_token="e737393710effa1bc6705aa0"
+api_OpenWeather_yourCity="London,gb"
 
 # Put the currency pair here to see the exchange rate. An amount of 1 curr1 will be converted to curr2
-# refer to each api for the list of supported apis
+# refer to each api for the list of supported currencies
 curr1="USD"
-curr2="COP"
+curr2="GBP"
 
 #------------NOTHING ELSE NEEDS TO BE CHANGED BEYOND THIS POINT---------------------
 
@@ -128,20 +129,21 @@ def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=ap
     while True:
         global disp_string_usd2cop_value
         try:
-            base_url="https://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}"
-            api_freeCurrConv_request=requests.get(base_url.format(c1, c2, tokenFCC))
-            api_freeCurrConv_json=api_freeCurrConv_request.json()
-            fcc_rate= c1 + "_" + c2
-            disp_string_usd2cop_value="1" + c1 + ":" + str(round(api_freeCurrConv_json[fcc_rate])) + c2
-            print(str(datetime.now()) + " " + "thr3_dollarconv got an update from FCC: " + disp_string_usd2cop_value)
-            time.sleep(3600) 
-        except (ConnectionError, KeyError, ValueError) as e:
-            base_url="https://v6.exchangerate-api.com/v6/{}/pair/{}/{}"
-            api_ExchangeRateAPI_request=requests.get(base_url.format(tokenERA, c1, c2))
-            api_ExchangeRateAPI_json=api_ExchangeRateAPI_request.json()
-            disp_string_usd2cop_value="1"+ c1 + ":" + str(round(api_ExchangeRateAPI_json['conversion_rate'])) + c2
-            print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA: " + disp_string_usd2cop_value)
-            time.sleep(86400) 
+            try:
+                base_url="https://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}"
+                api_freeCurrConv_request=requests.get(base_url.format(c1, c2, tokenFCC))
+                api_freeCurrConv_json=api_freeCurrConv_request.json()
+                fcc_rate= c1 + "_" + c2
+                disp_string_usd2cop_value="1" + c1 + ":" + str(round(api_freeCurrConv_json[fcc_rate])) + c2
+                print(str(datetime.now()) + " " + "thr3_dollarconv got an update from FCC: " + disp_string_usd2cop_value)
+                time.sleep(3600) 
+            except (ConnectionError, KeyError, ValueError) as e:
+                base_url="https://v6.exchangerate-api.com/v6/{}/pair/{}/{}"
+                api_ExchangeRateAPI_request=requests.get(base_url.format(tokenERA, c1, c2))
+                api_ExchangeRateAPI_json=api_ExchangeRateAPI_request.json()
+                disp_string_usd2cop_value="1"+ c1 + ":" + str(round(api_ExchangeRateAPI_json['conversion_rate'])) + c2
+                print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA: " + disp_string_usd2cop_value)
+                time.sleep(86400) 
         except KeyError:
             disp_string_usd2cop_value="JSON Key error on exchange rate response. Check log. Retrying in 5 min."
             print(str(datetime.now()) + " thr3_dollarconv got an API error. \nFCC:" + str(api_freeCurrConv_json) + "\nERA:" + str(api_ExchangeRateAPI_json))
@@ -200,6 +202,19 @@ def long_string(display, text='', num_line=2, num_cols=16, speed=0.1):
     else:
         display.lcd_display_string(text, num_line)
 
+def get_ip():
+    '''function to get the ip of this machine'''
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
+
 def first_line():
     '''
     The instruction that displays the info in the first line.
@@ -210,8 +225,9 @@ def first_line():
     mytime=time.localtime()
     
     # This shows the last 3 characters of our IP, the day and the month, and lastly the hour, a semicolon and the minutes.
-    my_ip = get_ip.get_ip()
+    my_ip = get_ip()
     display.lcd_display_string("i:" + my_ip[-3:] + " " + str(mytime.tm_mday).zfill(2) + str(mytime.tm_mon).zfill(2) + " " + str(mytime.tm_hour) + ":" + str(mytime.tm_min).zfill(2), 1)
+
 
 
 # print(dir(drivers))
