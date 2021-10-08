@@ -8,6 +8,7 @@ import threading
 import requests
 import random
 import socket
+
 '''
 This is a script that takes info from some apis and shows it in the 16*2 display.
 It uses the following apis:
@@ -15,7 +16,7 @@ It uses the following apis:
 THEYSAIDSO.COM
 Free public API that provides famous quotes from well known people.
 
-EXCHANGERATE-API.COM / FREE.CURRCONV.COM
+EXCHANGERATE-API.COM / FREE.CURRENCYCONVERTERAPI.COM
 There are a lot of currency apis but these ones offer free currency exchange info
 
 OPENWEATHERMAP.ORG
@@ -49,7 +50,7 @@ display = drivers.Lcd()
 # Global variables go here. These store the info from the apis that we want to display. Do not put anything here.
 api_tss_catlist_json=""
 disp_string_tss_quote=""
-disp_string_usd2cop_value=""
+disp_string_convCur_value=""
 disp_string_weatherInfo=""
 
 ### HERE WE GET THE INFO WE NEED FROM EITHER THE SYSTEM OR THE APIS ###
@@ -127,33 +128,33 @@ def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=ap
     '''
     print(str(datetime.now()) + " " + "starting the currency conversion request")
     while True:
-        global disp_string_usd2cop_value
+        global disp_string_convCur_value
         try:
             try:
                 base_url="https://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}"
                 api_freeCurrConv_request=requests.get(base_url.format(c1, c2, tokenFCC))
                 api_freeCurrConv_json=api_freeCurrConv_request.json()
                 fcc_rate= c1 + "_" + c2
-                disp_string_usd2cop_value="1" + c1 + ":" + str(round(api_freeCurrConv_json[fcc_rate])) + c2
-                print(str(datetime.now()) + " " + "thr3_dollarconv got an update from FCC: " + disp_string_usd2cop_value)
+                disp_string_convCur_value="1" + c1 + ":" + str(round(api_freeCurrConv_json[fcc_rate],2)) + c2
+                print(str(datetime.now()) + " " + "thr3_dollarconv got an update from FCC: " + disp_string_convCur_value)
                 time.sleep(3600) 
             except (ConnectionError, KeyError, ValueError) as e:
                 base_url="https://v6.exchangerate-api.com/v6/{}/pair/{}/{}"
                 api_ExchangeRateAPI_request=requests.get(base_url.format(tokenERA, c1, c2))
                 api_ExchangeRateAPI_json=api_ExchangeRateAPI_request.json()
-                disp_string_usd2cop_value="1"+ c1 + ":" + str(round(api_ExchangeRateAPI_json['conversion_rate'])) + c2
-                print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA: " + disp_string_usd2cop_value)
+                disp_string_convCur_value="1"+ c1 + ":" + str(round(api_ExchangeRateAPI_json['conversion_rate'],2)) + c2
+                print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA: " + disp_string_convCur_value)
                 time.sleep(86400) 
         except KeyError:
-            disp_string_usd2cop_value="JSON Key error on exchange rate response. Check log. Retrying in 5 min."
+            disp_string_convCur_value="JSON Key error on exchange rate response. Check log. Retrying in 5 min."
             print(str(datetime.now()) + " thr3_dollarconv got an API error. \nFCC:" + str(api_freeCurrConv_json) + "\nERA:" + str(api_ExchangeRateAPI_json))
             time.sleep(300)
         except ConnectionError:
-            disp_string_usd2cop_value="Connection Error while getting the exchange rate. Will try again in 10 seconds."
+            disp_string_convCur_value="Connection Error while getting the exchange rate. Will try again in 10 seconds."
             print(str(datetime.now()) + " thr3_dollarconv got a ConnectionError. will try again in 10 seconds.")
             time.sleep(10)
         except ValueError:
-            disp_string_usd2cop_value="JSON Decode Error while getting the exchange rate. Will try again in 20 seconds."
+            disp_string_convCur_value="JSON Decode Error while getting the exchange rate. Will try again in 20 seconds."
             print(str(datetime.now()) + " thr3_dollarconv got a ValueError. will try again in 20 seconds.")
             time.sleep(20)
 
@@ -257,7 +258,7 @@ if __name__=="__main__":
     else:
         thr3_dollarconv.start()
 
-    while disp_string_usd2cop_value == "":
+    while disp_string_convCur_value == "":
         # we wait for the conversion variable to get populated to start the next thread
         pass
     else:
@@ -283,7 +284,7 @@ if __name__=="__main__":
             display.lcd_clear()
 
             first_line() 
-            long_string(display, disp_string_usd2cop_value, 2)
+            long_string(display, disp_string_convCur_value, 2)
             time.sleep(4)
             display.lcd_clear()
 
