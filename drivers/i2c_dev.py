@@ -61,7 +61,7 @@ class I2CDevice:
             # try autodetect address, else use default if provided
             try:
                 self.addr = int('0x{}'.format(
-                    findall("[0-9a-z]{2}(?!:)", check_output(['/usr/sbin/i2cdetect', '-y', BUS_NUMBER]))[0]), base=16) \
+                    findall("[0-9a-z]{2}(?!:)", check_output(['/usr/sbin/i2cdetect', '-y', str(BUS_NUMBER)]))[0]), base=16) \
                     if exists('/usr/sbin/i2cdetect') else addr_default
             except:
                 self.addr = addr_default
@@ -98,8 +98,9 @@ class I2CDevice:
 
 
 class Lcd:
-    def __init__(self):
-        self.lcd = I2CDevice(addr_default=0x27)
+    def __init__(self, addr=None):
+        self.addr = addr
+        self.lcd = I2CDevice(addr=self.addr, addr_default=0x27)
         self.lcd_write(0x03)
         self.lcd_write(0x03)
         self.lcd_write(0x03)
