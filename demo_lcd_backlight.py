@@ -9,9 +9,9 @@
 # Backlight: display.lcd_backlight(0) # Turn backlight off
 # Backlight: display.lcd_backlight(1) # Turn backlight on
 
-# If drivers/i2c_dev.py is NOT in same folder with your scripts, tst
+# If drivers/i2c_dev.py is NOT in same folder with your scripts,
 # uncomment below and set path to i2c_dev, e.g. "/home/pi/lcd"
-# import sys 
+# import sys
 # sys.path.append("/home/pi/lcd")
 
 # Import necessary libraries for communication and display use
