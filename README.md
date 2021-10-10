@@ -152,7 +152,9 @@ sudo systemctl status rpi-netmonitor.service
 ```
 ## Daily dashboard 
 Created by [@jdarias](https://github.com/jdarias). This is a script that shows the last three characters from your ip address, the date in DDMM format and the hour in HH:MM format
-
+<p align="center">
+  <img src="imgs/demo_iphour.gif">
+</p>
 It also takes info from the following apis and shows it in the 16\*2 display.
 
 * [THEYSAIDSO.COM](https://theysaidso.com): Free public API that provides famous quotes from well known people. It has a public endpoint that doesn't require an API key.
