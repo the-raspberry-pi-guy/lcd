@@ -157,13 +157,13 @@ Created by [@jdarias](https://github.com/jdarias). This is a script that shows t
 </p>
 It also takes info from the following apis and shows it in the 16\*2 display.
 
-* [THEYSAIDSO.COM](https://theysaidso.com): Free public API that provides famous quotes from well known people. It has a public endpoint that doesn't require an API key.
+* [theysaidso.com](https://theysaidso.com): Free public API that provides famous quotes from well known people. It has a public endpoint that doesn't require an API key.
 
-* [EXCHANGERATE-API.COM](https://exchangerate-api.com) / [FREE.CURRENCYCONVERTERAPI.COM](https://free.currencyconverterapi.com): There are a lot of currency apis but these ones offer free currency exchange info. Both are used, one as main, the other as backup.
+* [exchangerate-api.com](https://exchangerate-api.com) / [free.currencyconverterapi.com](https://free.currencyconverterapi.com): There are a lot of currency apis but these ones offer free currency exchange info. Both are used, one as main, the other as backup.
 
-* [OPENWEATHERMAP.ORG](https://openweathermap.org): Provides Weather info, forecasts, etc.
+* [openweathermap.org](https://openweathermap.org): Provides Weather info, forecasts, etc.
 
-In order to use the script you need to get keys for the exchange rate and the weather apis. Put your keys in the script and also set a currency exchange pair (see api documentation for currency support)
+In order to use the script you need to get API keys for both exchange rate services and the weather api. Put your keys in the script and also set a currency exchange pair (see api documentation for currency support)
 
 A city/country string is also needed to show weather info for such city.
 
