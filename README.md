@@ -150,7 +150,7 @@ sudo systemctl start rpi-netmonitor.service
 ```commandline
 sudo systemctl status rpi-netmonitor.service
 ```
-## Daily dashboard 
+## Tiny dashboard 
 Created by [@jdarias](https://github.com/jdarias). This is a script that shows the last three characters from your ip address, the date in DDMM format and the hour in HH:MM format
 <p align="center">
   <img src="imgs/demo_iphour.gif">

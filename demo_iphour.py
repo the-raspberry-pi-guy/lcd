@@ -204,7 +204,8 @@ def long_string(display, text='', num_line=2, num_cols=16, speed=0.1):
         display.lcd_display_string(text, num_line)
 
 def get_ip():
-    '''function to get the ip of this machine'''
+    '''function to get the ip of this machine
+       source: https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib#answer-28950776'''
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         # doesn't even have to be reachable
