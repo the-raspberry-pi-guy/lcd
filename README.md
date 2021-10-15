@@ -163,8 +163,10 @@ It also takes info from the following apis and shows it in the 16\*2 display.
 
 * [openweathermap.org](https://openweathermap.org): Provides Weather info, forecasts, etc.
 
-In order to use the script you need to get API keys for both exchange rate services and the weather api. Put your keys in the script and also set a currency exchange pair (see api documentation for currency support)
+In order to use the script you need to get API key tokens for both exchange rate services and the weather api. Open the script in a text editor and put your tokens in the USER VARIABLES section.
 
-A city/country string is also needed to show weather info for such city.
+Also set a currency exchange pair. For currency support and the currency codes you need to use see [https://free.currencyconverterapi.com](Here) for free.currencyconverter.com (click the "List of all currencies" link) and [https://www.exchangerate-api.com/docs/supported-currencies](Here) for exchangerate-api.com
 
-I am not affiliated to any of the information services mentioned!
+A city/country string is also needed to show weather info for such city. Search for your city on openweathermap.org and take note of the name,country and put it in the script. London,gb is given as an example.
+
+I, @jdarias am not affiliated to, or responsible of the information services used in this script.
