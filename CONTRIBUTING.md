@@ -91,12 +91,12 @@ A pull request (PR) allows you to push changes from your fork directly into [`th
   ```sh
   git pull --rebase upstream master
   ```
-and if there are conflicts, [resolve them][gh-docs-conflicts]:
-  1. `git status` to show the conflict;
-  2. Edit the conflicting file to resolve the lines between `<<< || >>>` and save the file;
-  3. `git add <CONFLICTING-FILE>` to add the change (or `git rm <CONFLICTING-FILE>` if resolving the conflict means removing the file);
-  4. `git rebase --continue` to continue the rebasing;
-  5. Repeat the steps 2-4 until all conflicts are resolved.
+  and if there are conflicts, [resolve them][gh-docs-conflicts]:
+    1. `git status` to show the conflict;
+    2. Edit the conflicting file to resolve the lines between `<<< || >>>` and save the file;
+    3. `git add <CONFLICTING-FILE>` to add the change (or `git rm <CONFLICTING-FILE>` if resolving the conflict means removing the file);
+    4. `git rebase --continue` to continue the rebasing;
+    5. Repeat the steps 2-4 until all conflicts are resolved.
 
 
 - When you're done resolving any possible conflicts, push your `<TOPIC>` branch to your fork:
