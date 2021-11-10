@@ -28,7 +28,7 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
   ```
 
 # Demos
-## Simple strings
+## Demo LCD
 This is a demo developed by user @Tomtom0201, showing how simple text stings could be displayed on LCD:
 
 <p align="center">
