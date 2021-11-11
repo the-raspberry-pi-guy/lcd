@@ -25,28 +25,30 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
 4. [Contributions](#contributions)
 
 # Installation
-* Install git
+- Install git
   ```
   sudo apt install git
   ```
 
-* Clone the repo in your `pi` home directory
+- Clone the repo in your `pi` home directory
   ```
   cd /home/pi/
   git clone https://github.com/the-raspberry-pi-guy/lcd.git
   cd lcd/
   ```
 
-* Run the automatic installation script with `sudo` permission
+- Run the automatic installation script with `sudo` permission
   ```
   sudo ./install.sh
   ```
 
-* After rebooting, try one of the [**demos**](#demos)
+- After rebooting, try one of the [**demos**](#demos)
   ```
   cd /home/pi/lcd/
   ./demo_clock.py
   ```
+
+[top :arrow_up:](#)
 
 # Demos
 A list of demonstration (demo) files that illustrate how to use the LCD driver.  Demos are ordered alphabetically.
@@ -168,6 +170,8 @@ This is a demo of a graphical progress bar created with [custom characters](#cus
   <img src="imgs/demo_progress_bar.jpg" width="50%">
 </p>
 
+[top :arrow_up:](#)
+
 # Implementation
 Once you are done editing a `demo_*.py` file or writing your own Python script, follow the instructions on this section to run the script in the background. First, however, ensure that the script (e.g., `script.py`) has at least permission to be executed, as follows:
 
@@ -224,9 +228,13 @@ Use the following procedure to run any LCD Python script as a (systemd) service:
    systemctl status rpi-lcd.service
    ```
 
+[top :arrow_up:](#)
+
 # Contributions
 Thank you for you interest in learning how to contribute to this repository.  We welcome contributions from novices to experts alike, so do not be afraid to give it a try if you are new to `git` and GitHub.  First, however, take a few minutes to read our [CONTRIBUTING.md](CONTRIBUTING.md) guide to learn how to open **Issues** and the various sorts of **Pull Requests (PRs)** that are currently accepted.
 
 In addition, if you've never contributed to an open source project before, please take a look at the following resources:
 - [Finding ways to contribute to open source on GitHub](https://docs.github.com/en/get-started/exploring-projects-on-github/finding-ways-to-contribute-to-open-source-on-github)
 - [Proposing changes to your work with pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests)
+
+[top :arrow_up:](#)
