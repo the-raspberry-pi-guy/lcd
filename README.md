@@ -17,7 +17,7 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
    - [Extended strings](#extended-strings)
    - [Forex](#forex)
    - [IP address](#ip-address)
-   - [LCD](#lcd)
+   - [LCD](#lcd-1)
    - [NetMonitor](#netmonitor)
    - [Progress bar](#progress-bar)
 3. [Implementation](#Implementation)
