@@ -49,21 +49,13 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
   ```
 
 # Demos
-## Demo LCD
-This is a demo developed by user @Tomtom0201, showing how simple text stings could be displayed on LCD:
+A list of demonstration (demo) files that illustrate how to use the LCD driver.  Demos are ordered alphabetically.
+
+## Backlight Control
+This is a demo developed by user and watcher @Tomtom0201, showcasing backlight control of the LCD (available on some hardware):
 
 <p align="center">
-  <img src="imgs/demo_simple_strings.jpg" width="300">
-</p>
-
-
-## Extended strings
-This is a demo debeloped by @juvus, showing how extended strings could be used. Extended strings can contain special placeholders `{0xFF}` - hex code of the symbol wrapped with curly bracers. Hex code of the symbol can be found in characters table. For example code of the symbol `ö` is 0xEF, and so this symbol could be printed by using `{0xEF}` placeholder in string. Table can be found in `/imgs/characters_table.png`.
-If you want to combine placeholder to write a symbol {0xFF} with native python placeholder {0} for inserting dome data into text, escape those placeholders that is using to write a symbol. This is an example:
- `display.lcd_display_extended_string("Symbol:{{0xEF}} data:{0}".format(5), 2)`
-
-<p align="center">
-  <img src="imgs/demo_extended_strings.jpg" width="300">
+  <img src="imgs/demo_backlight.gif">
 </p>
 
 ## Custom characters
@@ -73,18 +65,13 @@ It is possible to define in CG RAM memory 8 absolutelly custom characters. This 
   <img src="imgs/demo_custom_characters.jpg" width="300">
 </p>
 
-## Progress bar
-This is a demo of graphical progress bar created with custom characters. This bar could be used, for example, for showing the current level of battery charge. This demo was debeloped by @juvus.
+## Extended strings
+This is a demo debeloped by @juvus, showing how extended strings could be used. Extended strings can contain special placeholders `{0xFF}` - hex code of the symbol wrapped with curly bracers. Hex code of the symbol can be found in characters table. For example code of the symbol `ö` is 0xEF, and so this symbol could be printed by using `{0xEF}` placeholder in string. Table can be found in `/imgs/characters_table.png`.
+If you want to combine placeholder to write a symbol {0xFF} with native python placeholder {0} for inserting dome data into text, escape those placeholders that is using to write a symbol. This is an example:
+ `display.lcd_display_extended_string("Symbol:{{0xEF}} data:{0}".format(5), 2)`
 
 <p align="center">
-  <img src="imgs/demo_progress_bar.jpg" width="300">
-</p>
-
-## Backlight Control
-This is a demo developed by user and watcher @Tomtom0201, showcasing backlight control of the LCD (available on some hardware):
-
-<p align="center">
-  <img src="imgs/demo_backlight.gif">
+  <img src="imgs/demo_extended_strings.jpg" width="300">
 </p>
 
 ## Forex
@@ -115,6 +102,12 @@ Another demo developed by @Sierra007117:
 
 Display your Pi's IP address - useful for SSH'ing and more!
 
+## LCD
+This is a demo developed by user @Tomtom0201, showing how simple text stings could be displayed on LCD:
+
+<p align="center">
+  <img src="imgs/demo_simple_strings.jpg" width="300">
+</p>
 
 ## NetMonitor
 A demo created by [@cgomesu](https://github.com/cgomesu) that uses `ping` and `nc` (netcat) to monitor the network status of hosts and services, respectively.  This demo uses built-in tools, so nothing new needs to be installed.
@@ -171,3 +164,10 @@ sudo systemctl start rpi-netmonitor.service
 ```commandline
 sudo systemctl status rpi-netmonitor.service
 ```
+
+## Progress bar
+This is a demo of graphical progress bar created with custom characters. This bar could be used, for example, for showing the current level of battery charge. This demo was debeloped by @juvus.
+
+<p align="center">
+  <img src="imgs/demo_progress_bar.jpg" width="300">
+</p>
