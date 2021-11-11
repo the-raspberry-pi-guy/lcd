@@ -52,73 +52,98 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
 A list of demonstration (demo) files that illustrate how to use the LCD driver.  Demos are ordered alphabetically.
 
 ## Backlight Control
-This is a demo developed by user and watcher @Tomtom0201, showcasing backlight control of the LCD (available on some hardware):
+- Author: [@Tomtom0201](https://github.com/Tomtom0201)
+
+This demo showcases the backlight control of the LCD, which is available on some hardware:
 
 <p align="center">
   <img src="imgs/demo_backlight.gif" width="50%">
 </p>
 
 ## Custom characters
-It is possible to define in CG RAM memory 8 absolutelly custom characters. This characters can be pronted on LCD the same way as any characters from the character table. Codes of the custom characters are unique and the following: 1st - {0x00}, 2nd - {0x01}, 3rd - {0x02}, 4th - {0x03}, 5th - {0x04}, 6th - {0x05}, 7th - {0x06} and 8th - {0x07}. Please, see the `demo_lcd_custom_characters.py` file for more details, how it is possible to define you own characters. This demo was debeloped by @juvus.
+- Author: [@juvus](https://github.com/juvus)
+
+It is possible to define in CG RAM memory up to 8 custom characters. These characters can be prompted on LCD the same way as any characters from the [characters table](imgs/characters_table.png). Codes for the custom characters are unique and as follows:
+
+  1. `{0x00}`
+  2. `{0x01}`
+  3. `{0x02}`
+  4. `{0x03}`
+  5. `{0x04}`
+  6. `{0x05}`
+  7. `{0x06}`
+  8. `{0x07}`
+
+Please, see the comments and implementation in the [`demo_lcd_custom_characters.py`](demo_lcd_custom_characters.py) file for more details on how to use custom characters.
 
 <p align="center">
   <img src="imgs/demo_custom_characters.jpg" width="50%">
 </p>
 
 ## Extended strings
-This is a demo debeloped by @juvus, showing how extended strings could be used. Extended strings can contain special placeholders `{0xFF}` - hex code of the symbol wrapped with curly bracers. Hex code of the symbol can be found in characters table. For example code of the symbol `ö` is 0xEF, and so this symbol could be printed by using `{0xEF}` placeholder in string. Table can be found in `/imgs/characters_table.png`.
-If you want to combine placeholder to write a symbol {0xFF} with native python placeholder {0} for inserting dome data into text, escape those placeholders that is using to write a symbol. This is an example:
- `display.lcd_display_extended_string("Symbol:{{0xEF}} data:{0}".format(5), 2)`
+- Author: [@juvus](https://github.com/juvus)
+
+This is demo showcases how extended strings could be used. Extended strings can contain special placeholders of form `{0xFF}`, that is, a hex code of the symbol wrapped within curly brackets. Hex codes of various symbols can be found in the following characters table:
+
+<p align="center">
+  <img src="imgs/characters_table.png" width="50%">
+</p>
+
+For example, the hex code of the symbol `ö` is `0xEF`, and so this symbol could be printed on the second row of the display by using the `{0xEF}` placeholder, as follows:
+
+```Python
+display.lcd_display_extended_string("{0xEF}", 2)
+```
+
+If you want to combine placeholder to write a symbol `{0xFF}` with the native Python placeholder `{0}` for inserting dome data into text, escape the non-native placeholders. Here is an example:
+
+```Python
+display.lcd_display_extended_string("Symbol:{{0xEF}} data:{0}".format(5), 2)
+```
 
 <p align="center">
   <img src="imgs/demo_extended_strings.jpg" width="50%">
 </p>
 
 ## Forex
-This is a demo developed by user and watcher @bariskisir.  It requires `python-pip` and the packages `requests` and `bs4` (BeautifulSoup) because it parses web content.
+- Author: [@bariskisir](https://github.com/bariskisir)
+- Additional Python package requirements: `pip`, `requests`, `bs4`
 
-* Install `pip`
-  ```
-  sudo apt install python-pip
-  ```
-* Then install `requests` and `bs4`
-  ```
-  pip install requests bs4
-  ```
-* Now you should be able to run `demo_forex.py`:
+To install the requirements, follow this procedure:
+  - Install `pip` and use it to install the remaining packages
+    ```sh
+    sudo apt install python-pip
+    pip install requests bs4
+    ```
 
 <p align="center">
   <img src="imgs/demo_forex.gif" width="50%">
 </p>
 
-I haven't been able to test it myself personally, but it looks like a cool Forex stream. If you run into any bugs with it, please feel free to reach out to bariskisir and submit a PR.
-
 ## IP Address
-Another demo developed by @Sierra007117:
+- Author: [@Sierra007117](https://github.com/Sierra007117)
+
+Display your Pi's IP address, which is useful for `SSH` access and more!
 
 <p align="center">
   <img src="imgs/demo_ip.jpg" width="50%">
 </p>
 
-Display your Pi's IP address - useful for SSH'ing and more!
-
 ## LCD
-This is a demo developed by user @Tomtom0201, showing how simple text stings could be displayed on LCD:
+- Author: [@Tomtom0201](https://github.com/Tomtom0201)
+
+This demo shows how simple strings could be displayed on the LCD.  For extended usage, take a look at [Extended strings](#extended-strings) demo instead.
 
 <p align="center">
   <img src="imgs/demo_simple_strings.jpg" width="50%">
 </p>
 
 ## NetMonitor
-A demo created by [@cgomesu](https://github.com/cgomesu) that uses `ping` and `nc` (netcat) to monitor the network status of hosts and services, respectively.  This demo uses built-in tools, so nothing new needs to be installed.
+- Author: [@cgomesu](https://github.com/cgomesu)
 
-<p align="center">
-  <img src="imgs/demo_netmonitor.gif" width="50%">
-</p>
+This demo uses `ping` and `nc` (netcat) to monitor the network status of hosts and services, respectively. Hosts and services can be modified by editing their respective [dictionaries](https://docs.python.org/3/tutorial/datastructures.html#dictionaries):
 
-Hosts and services can be modified by editing their respective [dictionaries](https://docs.python.org/3/tutorial/datastructures.html#dictionaries):
-
-```python
+```Python
 hosts = {
     'Internet': '8.8.8.8',
     'Firewall': '192.168.1.1',
@@ -129,6 +154,10 @@ services = {
     'Plex': {'ip': '192.168.1.2', 'port': '32400'}
 }
 ```
+
+<p align="center">
+  <img src="imgs/demo_netmonitor.gif" width="50%">
+</p>
 
 After editing the hosts and services dictionaries, you can run this demo in the background (as a service) as follows:
 1. Create a new service file in `/lib/systemd/system/` called `rpi-netmonitor.service`:
@@ -166,7 +195,9 @@ sudo systemctl status rpi-netmonitor.service
 ```
 
 ## Progress bar
-This is a demo of graphical progress bar created with custom characters. This bar could be used, for example, for showing the current level of battery charge. This demo was debeloped by @juvus.
+- Author: [@juvus](https://github.com/juvus)
+
+This is a demo of a graphical progress bar created with [custom characters](#custom-characters). This bar could be used, for example, for showing the current level of battery charge.
 
 <p align="center">
   <img src="imgs/demo_progress_bar.jpg" width="50%">
