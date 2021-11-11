@@ -24,9 +24,9 @@ add the associated error here
 - Python version : `add here`
 
 **Checklist**
-[ ] I have watched and followed the instructions in the [Youtube tutorial](https://www.youtube.com/watch?v=fR5XhHYzUK0).
-[ ] I have searched [open and closed issues](https://github.com/the-raspberry-pi-guy/lcd/issues) for either an identical or similar bug before reporting this new one.
-[ ] I have used Python 3.x
+- [ ] I have watched and followed the instructions in the [Youtube tutorial](https://www.youtube.com/watch?v=fR5XhHYzUK0).
+- [ ] I have searched [open and closed issues](https://github.com/the-raspberry-pi-guy/lcd/issues) for either an identical or similar bug before reporting this new one.
+- [ ] I have used Python 3.x
 
 **Additional context**
 Add any other context about the problem here.
