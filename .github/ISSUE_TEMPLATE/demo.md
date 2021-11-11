@@ -1,6 +1,6 @@
 ---
 name: Demo
-about: Issues specifically related to a demo_*.py demonstration file
+about: Issues specifically related to a demo Python file
 title: ''
 labels: demo
 assignees: ''
@@ -28,9 +28,9 @@ add the associated error here
 - Python version : `add here`
 
 **Checklist**
-[ ] I have watched and followed the instructions in the [Youtube tutorial](https://www.youtube.com/watch?v=fR5XhHYzUK0).
-[ ] I have searched [open and closed issues](https://github.com/the-raspberry-pi-guy/lcd/issues) for either an identical or similar bug before reporting this new one.
-[ ] I have used Python 2.7
+- [ ] I have watched and followed the instructions in the [Youtube tutorial](https://www.youtube.com/watch?v=fR5XhHYzUK0).
+- [ ] I have searched [open and closed issues](https://github.com/the-raspberry-pi-guy/lcd/issues) for either an identical or similar bug before reporting this new one.
+- [ ] I have used Python 2.7
 
 **Additional context**
 Add any other context about the problem here.
