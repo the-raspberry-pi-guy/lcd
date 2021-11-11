@@ -1,6 +1,12 @@
 # LCD
 This repository contains all the code for interfacing with a **16x2 character I2C liquid-crystal display (LCD)**. This accompanies my **Youtube tutorial**: [Raspberry Pi - Mini LCD Display Tutorial](https://www.youtube.com/watch?v=fR5XhHYzUK0).
 
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=fR5XhHYzUK0">
+    <img src="imgs/thumb-yt-rpiguy-lcd-tutorial.png" width="80%">
+  </a>
+</p>
+
 You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi Hut](https://thepihut.com/search?type=product&q=lcd).
 
 # Table of Contents
