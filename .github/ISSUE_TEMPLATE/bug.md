@@ -2,7 +2,7 @@
 name: Bug
 about: 'Bugs refer to replicable issues directly related to the latest version of
   one or more of the following files: (a) configs/*; (b) drivers/*; (c) install.sh;
-  and (d) setup.sh.'
+  and (d) setup.sh'
 title: ''
 labels: bug
 assignees: ''
@@ -28,9 +28,9 @@ add the associated error here
 
 
 **Checklist**
-[ ] I have watched and followed the instructions in the [Youtube tutorial](https://www.youtube.com/watch?v=fR5XhHYzUK0).
-[ ] I have searched [open and closed issues](https://github.com/the-raspberry-pi-guy/lcd/issues) for either an identical or similar bug before reporting this new one.
-[ ] (If Python related.) I have used Python 2.7
+- [ ] I have watched and followed the instructions in the [Youtube tutorial](https://www.youtube.com/watch?v=fR5XhHYzUK0).
+- [ ] I have searched [open and closed issues](https://github.com/the-raspberry-pi-guy/lcd/issues) for either an identical or similar bug before reporting this new one.
+- [ ] (If Python related.) I have used Python 2.7
 
 **Additional context**
 Add any other context about the problem here.
