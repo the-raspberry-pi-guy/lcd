@@ -1,7 +1,7 @@
 ---
 name: Documentation
 about: Issues specifically related to typos or missing information in the Wiki or
-  other documentation file.
+  other documentation file
 title: ''
 labels: documentation
 assignees: ''
