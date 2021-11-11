@@ -1,7 +1,7 @@
 ---
 name: Other
 about: Any other issue that is directly related to this repository and is not covered
-  by the other issue categories.
+  by the other issue categories
 title: ''
 labels: other
 assignees: ''
