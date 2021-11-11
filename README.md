@@ -55,14 +55,14 @@ A list of demonstration (demo) files that illustrate how to use the LCD driver. 
 This is a demo developed by user and watcher @Tomtom0201, showcasing backlight control of the LCD (available on some hardware):
 
 <p align="center">
-  <img src="imgs/demo_backlight.gif">
+  <img src="imgs/demo_backlight.gif" width="50%">
 </p>
 
 ## Custom characters
 It is possible to define in CG RAM memory 8 absolutelly custom characters. This characters can be pronted on LCD the same way as any characters from the character table. Codes of the custom characters are unique and the following: 1st - {0x00}, 2nd - {0x01}, 3rd - {0x02}, 4th - {0x03}, 5th - {0x04}, 6th - {0x05}, 7th - {0x06} and 8th - {0x07}. Please, see the `demo_lcd_custom_characters.py` file for more details, how it is possible to define you own characters. This demo was debeloped by @juvus.
 
 <p align="center">
-  <img src="imgs/demo_custom_characters.jpg" width="300">
+  <img src="imgs/demo_custom_characters.jpg" width="50%">
 </p>
 
 ## Extended strings
@@ -71,7 +71,7 @@ If you want to combine placeholder to write a symbol {0xFF} with native python p
  `display.lcd_display_extended_string("Symbol:{{0xEF}} data:{0}".format(5), 2)`
 
 <p align="center">
-  <img src="imgs/demo_extended_strings.jpg" width="300">
+  <img src="imgs/demo_extended_strings.jpg" width="50%">
 </p>
 
 ## Forex
@@ -88,7 +88,7 @@ This is a demo developed by user and watcher @bariskisir.  It requires `python-p
 * Now you should be able to run `demo_forex.py`:
 
 <p align="center">
-  <img src="imgs/demo_forex.gif">
+  <img src="imgs/demo_forex.gif" width="50%">
 </p>
 
 I haven't been able to test it myself personally, but it looks like a cool Forex stream. If you run into any bugs with it, please feel free to reach out to bariskisir and submit a PR.
@@ -97,7 +97,7 @@ I haven't been able to test it myself personally, but it looks like a cool Forex
 Another demo developed by @Sierra007117:
 
 <p align="center">
-  <img src="imgs/demo_ip.jpg" width="640" height="480">
+  <img src="imgs/demo_ip.jpg" width="50%">
 </p>
 
 Display your Pi's IP address - useful for SSH'ing and more!
@@ -106,14 +106,14 @@ Display your Pi's IP address - useful for SSH'ing and more!
 This is a demo developed by user @Tomtom0201, showing how simple text stings could be displayed on LCD:
 
 <p align="center">
-  <img src="imgs/demo_simple_strings.jpg" width="300">
+  <img src="imgs/demo_simple_strings.jpg" width="50%">
 </p>
 
 ## NetMonitor
 A demo created by [@cgomesu](https://github.com/cgomesu) that uses `ping` and `nc` (netcat) to monitor the network status of hosts and services, respectively.  This demo uses built-in tools, so nothing new needs to be installed.
 
 <p align="center">
-  <img src="imgs/demo_netmonitor.gif">
+  <img src="imgs/demo_netmonitor.gif" width="50%">
 </p>
 
 Hosts and services can be modified by editing their respective [dictionaries](https://docs.python.org/3/tutorial/datastructures.html#dictionaries):
@@ -169,5 +169,5 @@ sudo systemctl status rpi-netmonitor.service
 This is a demo of graphical progress bar created with custom characters. This bar could be used, for example, for showing the current level of battery charge. This demo was debeloped by @juvus.
 
 <p align="center">
-  <img src="imgs/demo_progress_bar.jpg" width="300">
+  <img src="imgs/demo_progress_bar.jpg" width="50%">
 </p>
