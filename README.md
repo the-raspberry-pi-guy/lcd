@@ -1,28 +1,43 @@
 # LCD
-This repository contains all the code for interfacing with a **16x2 character I2C liquid-crystal display (LCD)**. This accompanies my **Youtube tutorial**: [Raspberry Pi - Mini LCD Display Tutorial](https://www.youtube.com/watch?v=fR5XhHYzUK0). 
+This repository contains all the code for interfacing with a **16x2 character I2C liquid-crystal display (LCD)**. This accompanies my **Youtube tutorial**: [Raspberry Pi - Mini LCD Display Tutorial](https://www.youtube.com/watch?v=fR5XhHYzUK0).
 
 You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi Hut](https://thepihut.com/search?type=product&q=lcd).
 
+# Table of Contents
+1. [Installation](#Installation)
+2. [Demos](#demos)
+   - [Backlight control](#backlight-control)
+   - [Custom characters](#custom-characters)
+   - [Extended strings](#extended-strings)
+   - [Forex](#forex)
+   - [IP address](#ip-address)
+   - [LCD](#lcd)
+   - [NetMonitor](#netmonitor)
+   - [Progress bar](#progress-bar)
+3. [Implementation](#Implementation)
+   - [Systemd](#systemd)
+4. [Contributions](#contributions)
+
 # Installation
 * Install git
-  ``` 
+  ```
   sudo apt install git
   ```
 
 * Clone the repo in your `pi` home directory
-  ``` 
+  ```
   cd /home/pi/
   git clone https://github.com/the-raspberry-pi-guy/lcd.git
   cd lcd/
   ```
 
 * Run the automatic installation script with `sudo` permission
-  ``` 
+  ```
   sudo ./install.sh
   ```
 
 * After rebooting, try one of the [**demos**](#demos)
-  ``` 
+  ```
   cd /home/pi/lcd/
   ./demo_clock.py
   ```
@@ -39,7 +54,7 @@ This is a demo developed by user @Tomtom0201, showing how simple text stings cou
 ## Extended strings
 This is a demo debeloped by @juvus, showing how extended strings could be used. Extended strings can contain special placeholders `{0xFF}` - hex code of the symbol wrapped with curly bracers. Hex code of the symbol can be found in characters table. For example code of the symbol `ö` is 0xEF, and so this symbol could be printed by using `{0xEF}` placeholder in string. Table can be found in `/imgs/characters_table.png`.
 If you want to combine placeholder to write a symbol {0xFF} with native python placeholder {0} for inserting dome data into text, escape those placeholders that is using to write a symbol. This is an example:
- `display.lcd_display_extended_string("Symbol:{{0xEF}} data:{0}".format(5), 2)` 
+ `display.lcd_display_extended_string("Symbol:{{0xEF}} data:{0}".format(5), 2)`
 
 <p align="center">
   <img src="imgs/demo_extended_strings.jpg" width="300">
@@ -60,7 +75,7 @@ This is a demo of graphical progress bar created with custom characters. This ba
 </p>
 
 ## Backlight Control
-This is a demo developed by user and watcher @Tomtom0201, showcasing backlight control of the LCD (available on some hardware): 
+This is a demo developed by user and watcher @Tomtom0201, showcasing backlight control of the LCD (available on some hardware):
 
 <p align="center">
   <img src="imgs/demo_backlight.gif">
