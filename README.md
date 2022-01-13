@@ -42,10 +42,28 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
   sudo ./install.sh
   ```
 
-- After rebooting, try one of the [**demos**](#demos)
+- During the installation, pay attention to any messages about `python` and `python3` usage, as they inform which version you should use to interface with the LCD driver.  For example:
   ```
-  cd /home/pi/lcd/
-  ./demo_clock.py
+  [LCD] [INFO] You may use either 'python' or 'python3' to interface with the lcd.
+  ```
+  or alternatively,
+  ```
+  [LCD] [INFO] Use 'python3' to interface with the lcd.
+  ```
+
+- At the end of the installation script, you'll be prompted to reboot the RPi to apply the changes made to `/boot/config.txt` and `/etc/modules`.
+
+- After rebooting, try one of the [**demos**](#demos):
+  ```
+  ./home/pi/lcd/demo_clock.py
+  ```
+  or
+  ```
+  python /home/pi/lcd/demo_clock.py
+  ```
+  or
+  ```
+  python3 /home/pi/lcd/demo_clock.py
   ```
 
 [top :arrow_up:](#)
@@ -204,7 +222,7 @@ Use the following procedure to run any LCD Python script as a (systemd) service:
    User=pi
    #Group=users
 
-   ## Edit the following with the full path to your script
+   ## Edit the following with the full path to the compatible Python version and your script
    ExecStart=/usr/bin/python /path/to/script.py
 
    Restart=always
