@@ -30,9 +30,9 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
   sudo apt install git
   ```
 
-- Clone the repo in your `pi` home directory
+- Clone the repo in your home directory
   ```
-  cd /home/pi/
+  cd /home/${USER}/
   git clone https://github.com/the-raspberry-pi-guy/lcd.git
   cd lcd/
   ```
@@ -55,15 +55,15 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
 
 - After rebooting, try one of the [**demos**](#demos):
   ```
-  ./home/pi/lcd/demo_clock.py
+  ./home/${USER}/lcd/demo_clock.py
   ```
   or
   ```
-  python /home/pi/lcd/demo_clock.py
+  python /home/${USER}/lcd/demo_clock.py
   ```
   or
   ```
-  python3 /home/pi/lcd/demo_clock.py
+  python3 /home/${USER}/lcd/demo_clock.py
   ```
 
 [top :arrow_up:](#)
@@ -197,10 +197,10 @@ Once you are done editing a `demo_*.py` file or writing your own Python script, 
 sudo chmod +x script.py
 ```
 
-Similarly, file ownership can be configured via `chown`.  For example, to set the user `pi` as owner of the file `script.py`, run the following:
+Similarly, file ownership can be configured via `chown`.  For example, to set the user `${USER}` as owner of the file `script.py`, run the following:
 
 ```sh
-sudo chown pi script.py
+sudo chown ${USER} script.py
 ```
 
 ## Systemd
@@ -212,6 +212,9 @@ Use the following procedure to run any LCD Python script as a (systemd) service:
    ```
 
 2. Copy and paste the following in the new unit file:
+
+   (*If your user is different than `pi`, remember to edit the `User=` entry.*)
+
    ```sh
    [Unit]
    Description=RPi Python script for a 16x2 LCD
