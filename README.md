@@ -188,6 +188,31 @@ This is a demo of a graphical progress bar created with [custom characters](#cus
   <img src="imgs/demo_progress_bar.jpg" width="50%">
 </p>
 
+## Tiny dashboard 
+- Author: [@jdarias](https://github.com/jdarias). 
+
+This is a script that shows a famous quote, a currency conversion pair of your choice and the weather of a city. It also shows the last three characters from your ip address, the date in DDMM format and the hour in HH:MM format
+
+<p align="center">
+  <img src="imgs/demo_iphour.gif">
+</p>
+
+The script takes info from the following apis and shows it in the 16\*2 display.
+
+* [theysaidso.com](https://theysaidso.com): Free public API that provides famous quotes from well known people. It has a public endpoint that doesn't require an API key.
+
+* [exchangerate-api.com](https://exchangerate-api.com) / [free.currencyconverterapi.com](https://free.currencyconverterapi.com): There are a lot of currency apis but these ones offer free currency exchange info. Both are used, one as main, the other as backup.
+
+* [openweathermap.org](https://openweathermap.org): Provides Weather info, forecasts, etc.
+
+In order to use the script you need to get API key tokens for both exchange rate services and the weather api. Open the script in a text editor and put your tokens in the USER VARIABLES section.
+
+Also set a currency exchange pair. For currency support and the currency codes you need to use, see [Here for free.currencyconverter.com](https://free.currencyconverterapi.com) (click the "List of all currencies" link) and [Here for exchangerate-api.com](https://www.exchangerate-api.com/docs/supported-currencies)
+
+A city/country string is also needed to show weather info for such city. Search for your city on openweathermap.org and take note of the name,country and put it in the script. London,gb is given as an example.
+
+I, [@jdarias](https://github.com/jdarias) am not affiliated to, or responsible of the information services used in this script.
+
 [top :arrow_up:](#)
 
 # Implementation
