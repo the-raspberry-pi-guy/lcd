@@ -20,6 +20,7 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
    - [LCD](#lcd-1)
    - [NetMonitor](#netmonitor)
    - [Progress bar](#progress-bar)
+   - [Tiny Dashboard](#tiny-dashboard)
 3. [Implementation](#Implementation)
    - [Systemd](#systemd)
 4. [Contributions](#contributions)
@@ -189,7 +190,7 @@ This is a demo of a graphical progress bar created with [custom characters](#cus
 </p>
 
 ## Tiny dashboard 
-- Author: [@jdarias](https://github.com/jdarias). 
+- Author: [@jdarias](https://github.com/jdarias)
 
 This is a script that shows a famous quote, a currency conversion pair of your choice and the weather of a city. It also shows the last three characters from your ip address, the date in DDMM format and the hour in HH:MM format
 
@@ -208,7 +209,7 @@ The script takes info from the following APIs:
 
 In order to use the script, you need to get **API key tokens for both exchange rate services and the weather api**. Once you've done that, edit the script to put your tokens in the USER VARIABLES section.
 
-Also set a currency exchange pair. For currency support and the currency codes you need to use, see [exchangerate-api.com/docs/supported-currencies](https://www.exchangerate-api.com/docs/supported-currencies)
+Also set a currency exchange pair. For currency support and the currency codes you need to use, see [exchangerate-api.com/docs/supported-currencies](https://www.exchangerate-api.com/docs/supported-currencies).
 
 A city/country string is also needed to show weather info for such city. Search for your city on [openweathermap.org](https://openweathermap.org) and take note of the `City,country` string and put it in the script.`London,gb` is given as an example.
 
