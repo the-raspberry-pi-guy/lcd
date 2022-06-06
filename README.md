@@ -189,13 +189,13 @@ This is a demo of a graphical progress bar created with [custom characters](#cus
   <img src="imgs/demo_progress_bar.jpg" width="50%">
 </p>
 
-## Tiny dashboard 
+## Tiny dashboard
 - Author: [@jdarias](https://github.com/jdarias)
 
 This is a script that shows a famous quote, a currency conversion pair of your choice and the weather of a city. It also shows the last three characters from your ip address, the date in DDMM format and the hour in HH:MM format
 
 <p align="center">
-  <img src="imgs/demo_iphour.gif" width="50%">
+  <img src="imgs/demo_tiny_dashboard.gif" width="50%">
 </p>
 
 The script takes info from the following APIs:
