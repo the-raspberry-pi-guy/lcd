@@ -200,7 +200,7 @@ This is a script that shows a famous quote, a currency conversion pair of your c
 
 The script takes info from the following APIs:
 
-* [theysaidso.com](https://theysaidso.com): Free public API that provides famous quotes from well known people. It has a public endpoint that doesn't require an API key.
+* [quotable.io](https://github.com/lukePeavey/quotable): Free public API that provides famous quotes from well known people. It has a public endpoint that doesn't require an API key.
 
 * [exchangerate-api.com](https://exchangerate-api.com) / [free.currencyconverterapi.com](https://free.currencyconverterapi.com): There are a lot of currency apis but these ones offer free currency exchange info. Both are used, one as main, the other as backup. Requires an API key to use.
 

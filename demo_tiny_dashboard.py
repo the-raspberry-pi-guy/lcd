@@ -6,15 +6,14 @@ from datetime import datetime
 import time
 import threading
 import requests
-import random
 import socket
 
 '''
 This is a script that takes info from some apis and shows it in the 16*2 display.
 It uses the following apis:
 
-THEYSAIDSO.COM
-Free public API that provides famous quotes from well known people.
+QUOTABLE.IO / https://github.com/lukePeavey/quotable
+Quotable is a free, open source quotations API that provides famous quotes from well known people.
 
 EXCHANGERATE-API.COM / FREE.CURRENCYCONVERTERAPI.COM
 There are a lot of currency apis but these ones offer free currency exchange info
@@ -34,8 +33,12 @@ api_OpenWeather_token=""
 api_freeCurrConv_token=""
 api_ExchangeRateAPI_token=""
 
+# minimum and maximum length of the quote obtained from quotable.io
+quote_minLength=0
+quote_maxLength=140
+
 # api_OpenWeather_yourCity : Search for your city in openweathermap.org, then put the <city,country> code here with no space in between.
-api_OpenWeather_yourCity="London,gb"
+api_OpenWeather_yourCity="London,GB"
 
 # Put the currency pair here to see the exchange rate. An amount of 1 curr1 will be converted to curr2
 # refer to each api for the list of supported currencies
@@ -48,76 +51,42 @@ curr2="GBP"
 display = drivers.Lcd()
 
 # Global variables go here. These store the info from the apis that we want to display. Do not put anything here.
-api_tss_catlist_json=""
-disp_string_tss_quote=""
-disp_string_convCur_value=""
+disp_string_quote=""
 disp_string_weatherInfo=""
+disp_string_convCur_value=""
 
 ### HERE WE GET THE INFO WE NEED FROM EITHER THE SYSTEM OR THE APIS ###
-def thread_get_theysaidso_catlist():
+def thread_get_quotable():
     ''' 
-    This is a thread that gets the category list from theysaidso.com
-    and puts it in the global variable api_tss_catlist_json
-    Then it sleeps for 48 hours to save on requests to tss
+    This is a thread that gets a random quote from quotable.io every 10 minutes
     '''
+    quotable_baseurl="https://api.quotable.io/quotes/random?minLength={}&maxLength={}"
+
     while True:
-        api_tss_catlist_req=requests.get("http://quotes.rest/qod/categories.json") # get the category list
-        print("thr1_catlist got response code: " + str(api_tss_catlist_req.status_code))
-        global api_tss_catlist_json
-        api_tss_catlist_json=api_tss_catlist_req.json() # convert it to json
-        print(str(datetime.now()) + " " + "thr1_catlist got a category list update")
-        time.sleep(172800) # sleep for 48 hours since it does not update that often
-
-        # need to handle exceptions for this! what happens if the api limit is exceeded?
-
-def get_theysaidso_randomcat():
-    '''
-    Function that picks a random category from the category list
-    It requires api_tss_catlist_json to be already populated 
-    It is used by the thread_get_theysaidso_qod
-    '''
-    global api_tss_catlist_json
-    try:
-        print("\n" + str(datetime.now()) + " picking a random from these:\n" + str(api_tss_catlist_json['contents']['categories']))
-        tss_list_cats=list(api_tss_catlist_json['contents']['categories'].items())
-        random_category=random.choice(tss_list_cats)
-        print(str(datetime.now()) + " " + "the random category is: " + random_category[0] + "\n")
-        return random_category[0]
-    except KeyError:
-        print(str(datetime.now()) + api_tss_catlist_json['error']['message'])
-        # to do: got an error so the quote string should show something about it
-
-def thread_get_theysaidso_qod():
-    '''
-    We create a base url with the space for the category.
-    Then we format it and get a random category with get_theysaidso_randomcat.
-    We then convert the response to json and return the string we need to display
-    We get a quote every half an hour
-    '''
-    tss_base_url="https://quotes.rest/qod?category={}"
-    while True:
-        global disp_string_tss_quote
+        global disp_string_quote
         try:
-            api_tss_quote_request=requests.get(tss_base_url.format(get_theysaidso_randomcat()))
-            print("thr2_get_tssqod got response code: " + str(api_tss_quote_request.status_code))
-            quote_json=api_tss_quote_request.json()
-            disp_string_tss_quote=quote_json['contents']['quotes'][0]['quote'] + " - " + quote_json['contents']['quotes'][0]['author']
-            print(str(datetime.now()) + " " + "thr2_get_tssqod got a quote update:\n" + "\t\t" + disp_string_tss_quote)
-            time.sleep(2700)
+            api_quotable_req=requests.get(quotable_baseurl.format(quote_minLength, quote_maxLength))
+            print("thread_get_quotable got response code: " + str(api_quotable_req.status_code)) # response
+            api_quotable_json=api_quotable_req.json() # convert it to json
+            disp_string_quote=api_quotable_json[0]['content'] + " - " + api_quotable_json[0]['author']
+            print(str(datetime.now()) + " " + "thread_get_quotable got a quote to display:\n" + "\t\t" + disp_string_quote)
+            time.sleep(600)
         except KeyError:
-            disp_string_tss_quote=quote_json['error']['message']
-            print(str(datetime.now()) + " " + "thr2_get_tssqod got an API error:\n" + "\t\t" + disp_string_tss_quote)
+            disp_string_quote="There is an error, we need to review log and debug"
+            print(str(datetime.now()) + " " + "thread_get_quotable got an API error:\n" + "\t\t" + disp_string_quote)
             time.sleep(300)
         except ConnectionError:
-            disp_string_tss_quote="Connection Error while getting the quote. Will try again in 10 seconds."
-            print(str(datetime.now()) + " " + "thr2_get_tssqod got a ConnectionError. will try again in 10 seconds.")
+            disp_string_quote="Connection Error while getting the quote. Will try again in 10 seconds."
+            print(str(datetime.now()) + " " + "thread_get_quotable got a ConnectionError. will try again in 10 seconds.")
             time.sleep(10)
         except ValueError:
-            disp_string_tss_quote="JSON Decode Error while getting the quote. Will try again in 20 seconds."
-            print(str(datetime.now()) + " " + "thr2_get_tssqod got a ValueError. will try again in 20 seconds.")
+            disp_string_quote="JSON Decode Error while getting the quote. Will try again in 20 seconds."
+            print(str(datetime.now()) + " " + "thread_get_quotable got a ValueError. will try again in 20 seconds.")
             time.sleep(20)
+        except:
+            disp_string_quote="There is an unknown error, we need to review log and debug"
 
-def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=api_freeCurrConv_token, c1=curr1, c2=curr2):
+def thread_get_currency_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=api_freeCurrConv_token, c1=curr1, c2=curr2):
     ''' 
     This thread gets the 1 usd to cop conversion. 
     Using ExchangeRate API (ERA) as first option. 
@@ -131,6 +100,13 @@ def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=ap
         global disp_string_convCur_value
         try:
             try:
+                base_url="https://v6.exchangerate-api.com/v6/{}/pair/{}/{}"
+                api_ExchangeRateAPI_request=requests.get(base_url.format(tokenERA, c1, c2))
+                api_ExchangeRateAPI_json=api_ExchangeRateAPI_request.json()
+                disp_string_convCur_value="1"+ c1 + ":" + str(round(api_ExchangeRateAPI_json['conversion_rate'],2)) + c2
+                print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA: " + disp_string_convCur_value)
+                time.sleep(86400) 
+            except (ConnectionError, KeyError, ValueError) as e:
                 base_url="https://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}"
                 api_freeCurrConv_request=requests.get(base_url.format(c1, c2, tokenFCC))
                 api_freeCurrConv_json=api_freeCurrConv_request.json()
@@ -138,13 +114,6 @@ def thread_get_dollar_conversion(tokenERA=api_ExchangeRateAPI_token, tokenFCC=ap
                 disp_string_convCur_value="1" + c1 + ":" + str(round(api_freeCurrConv_json[fcc_rate],2)) + c2
                 print(str(datetime.now()) + " " + "thr3_dollarconv got an update from FCC: " + disp_string_convCur_value)
                 time.sleep(3600) 
-            except (ConnectionError, KeyError, ValueError) as e:
-                base_url="https://v6.exchangerate-api.com/v6/{}/pair/{}/{}"
-                api_ExchangeRateAPI_request=requests.get(base_url.format(tokenERA, c1, c2))
-                api_ExchangeRateAPI_json=api_ExchangeRateAPI_request.json()
-                disp_string_convCur_value="1"+ c1 + ":" + str(round(api_ExchangeRateAPI_json['conversion_rate'],2)) + c2
-                print(str(datetime.now()) + " " + "thr3_dollarconv got an update from ERA: " + disp_string_convCur_value)
-                time.sleep(86400) 
         except KeyError:
             disp_string_convCur_value="JSON Key error on exchange rate response. Check log. Retrying in 5 min."
             print(str(datetime.now()) + " thr3_dollarconv got an API error. \nFCC:" + str(api_freeCurrConv_json) + "\nERA:" + str(api_ExchangeRateAPI_json))
@@ -231,39 +200,31 @@ def first_line():
     display.lcd_display_string("i:" + my_ip[-3:] + " " + str(mytime.tm_mday).zfill(2) + str(mytime.tm_mon).zfill(2) + " " + str(mytime.tm_hour) + ":" + str(mytime.tm_min).zfill(2), 1)
 
 
-
-# print(dir(drivers))
-# print(dir(drivers.Lcd))
-print("\nRPi APIS INFO FOR 16X2 DISPLAY. Version a.00\n")
+print("\nRPi TINY DASHBOARD FOR 16X2 DISPLAY.\n")
 
 # CREATING AND CALLING THREADS STARTS HERE
 if __name__=="__main__":
     # Start by declaring all these threads
-    thr1_catlist=threading.Thread(target=thread_get_theysaidso_catlist, daemon=True)
-    thr2_get_tssqod=threading.Thread(target=thread_get_theysaidso_qod, daemon=True)
-    thr3_dollarconv=threading.Thread(target=thread_get_dollar_conversion, daemon=True)
-    thr4_weatherinfo=threading.Thread(target=thread_get_weather_info, daemon=True)
+    thr1_get_quotable=threading.Thread(target=thread_get_quotable, daemon=True)
+    thr2_currconv=threading.Thread(target=thread_get_currency_conversion, daemon=True)
+    thr3_weatherinfo=threading.Thread(target=thread_get_weather_info, daemon=True)
     
     # Then we start the threads that populate the variables
-    thr1_catlist.start()
+    # We wait while the global variables get populated, then start the threads.
 
-    while api_tss_catlist_json == "":
-        # we wait for the categories info, then load thread 2
-        pass
-    else:
-        thr2_get_tssqod.start()
+    thr1_get_quotable.start()
 
-    while disp_string_tss_quote == "":
+    while disp_string_quote == "":
         # we wait for the quotes string to start the next thread
         pass
     else:
-        thr3_dollarconv.start()
+        thr2_currconv.start()
 
     while disp_string_convCur_value == "":
         # we wait for the conversion variable to get populated to start the next thread
         pass
     else:
-        thr4_weatherinfo.start()
+        thr3_weatherinfo.start()
 
     # let's see what do we have
     while disp_string_weatherInfo == "":
@@ -274,16 +235,19 @@ if __name__=="__main__":
     # THIS IS WHERE WE SEND THE INFO TO THE DISPLAY
     try:
         while True:
+            ''' display first line and quote '''
             first_line() 
-            long_string(display, disp_string_tss_quote, 2)
+            long_string(display, disp_string_quote, 2)
             time.sleep(2)
             display.lcd_clear()
             
+            ''' display first line and weather info '''
             first_line() 
             long_string(display, disp_string_weatherInfo, 2)
             time.sleep(2)
             display.lcd_clear()
 
+            ''' display first line and currency conversion '''
             first_line() 
             long_string(display, disp_string_convCur_value, 2)
             time.sleep(4)
