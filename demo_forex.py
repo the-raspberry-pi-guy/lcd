@@ -3,7 +3,7 @@
 
 import drivers
 import time
-import requests 
+import cloudscraper 
 import datetime
 import bs4
 
@@ -13,10 +13,6 @@ minute = 60
 iteration = minute/sleepSecond
 
 selectedCurrencyList = ["USD/TRY", "EUR/TRY", "EUR/USD", "GAU/TRY", u"BİST 100"]
-
-fakeHeaders = {
-    'User-Agent': 'Google Chrome'
-}
 
 
 def GetTime():
@@ -39,8 +35,8 @@ def PrintScreen(currency):
 
 
 def GetCurrencyList():
-    htmlResponse = requests.get(url="https://tr.investing.com/", headers=fakeHeaders)
-    html = htmlResponse.content
+    scraper = cloudscraper.create_scraper()
+    html = scraper.get("https://tr.investing.com/").text
     parsedHtml = bs4.BeautifulSoup(html, features="html.parser")
     htmlCurrencyList = parsedHtml.findAll("tr", {"class": "LeftLiContainer"})
     currencyTextList = list()
