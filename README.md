@@ -128,13 +128,13 @@ display.lcd_display_extended_string("Symbol:{{0xEF}} data:{0}".format(5), 2)
 
 ## Forex
 - Author: [@bariskisir](https://github.com/bariskisir)
-- Additional Python package requirements: `pip`, `requests`, `bs4`
+- Additional Python package requirements: `pip`, `cloudscraper`, `bs4`
 
 To install the requirements, follow this procedure:
   - Install `pip` and use it to install the remaining packages
     ```sh
     sudo apt install python-pip
-    pip install requests bs4
+    pip install cloudscraper bs4
     ```
 
 <p align="center">
@@ -209,6 +209,8 @@ The script takes info from the following APIs:
 
 In order to use the script, you need to get **API key tokens for both exchange rate services and the weather api**. Once you've done that, edit the script to put your tokens in the USER VARIABLES section.
 
+The quotable.io api allows a minimum and maximum character length restriction that needs to be set. By default minimum is 0 and maximum is 140.
+ 
 Also set a currency exchange pair. For currency support and the currency codes you need to use, see [exchangerate-api.com/docs/supported-currencies](https://www.exchangerate-api.com/docs/supported-currencies).
 
 A city/country string is also needed to show weather info for such city. Search for your city on [openweathermap.org](https://openweathermap.org) and take note of the `City,country` string and put it in the script.`London,gb` is given as an example.
