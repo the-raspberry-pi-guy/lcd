@@ -1,29 +1,23 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Import necessary libraries for communication and display use
-import drivers
-import time
-from time import sleep
-from time import strftime
-from datetime import datetime
 import glob
 import json
-
-import subprocess
 import os
-import sys
-
-import telepot
-
-from gpiozero import OutputDevice
-from gpiozero import CPUTemperature
-from telepot.loop import MessageLoop
-
-from gpiozero import CPUTemperature
+import subprocess
+from datetime import datetime
+from time import sleep
+from time import strftime
 
 import spotipy
+import telepot
+from gpiozero import CPUTemperature
+from gpiozero import OutputDevice
 from spotipy.oauth2 import SpotifyOAuth
+from telepot.loop import MessageLoop
+
+# Import necessary libraries for communication and display use
+import drivers
 
 
 # House temperature
