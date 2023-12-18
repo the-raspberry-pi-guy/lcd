@@ -1,3 +1,5 @@
+.cache
+SECRETS.json
 test
 .git
 .idea
