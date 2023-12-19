@@ -215,7 +215,7 @@ while True:
     # Retrieve ambient and CPU temperatures and gestion
     cpu = CPUTemperature()
     temp = cpu.temperature
-    cpu = str(cpu.temperature)
+    cpu = str(temp)
     if len(temp_file) > 0:
         temperature = ds18b20(temp_file[0])
         house_temp = str(temperature)
