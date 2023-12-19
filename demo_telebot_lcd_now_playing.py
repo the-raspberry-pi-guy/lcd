@@ -30,13 +30,31 @@ def ds18b20(temp_file):
     return float(temp_output[2:]) / 1000
 
 
+# Session state backlight
+def backlight(value):
+    session_state_backlight['backlight'] = {'is_backlight': value}
+
+
 # Commands from Telegram Bot
 def handle(msg):
     chat_id_input = msg['chat']['id']
     command = msg['text']
+
     if chat_id_input == chat_id_owner:
-        if command == '/temp':
+
+        # Command to ON/OFF LCD
+        if command == '/lcd_off':
+            backlight(0)
+            bot.sendMessage(chat_id_owner, "LCD OFF")
+        elif command == '/lcd_on':
+            backlight(1)
+            bot.sendMessage(chat_id_owner, "LCD ON")
+
+        # Get temperature of CPU and DS18B20
+        elif command == '/temp':
             bot.sendMessage(chat_id_owner, f'CPU: {cpu[0:4]}°C\nHouse: {house_temp[0:4]}°C ')
+
+        # Update Raspberry
         elif command == '/quick_update':
             weekly_update.on()
             bot.sendMessage(chat_id_owner, 'Starting update...')
@@ -54,9 +72,31 @@ def handle(msg):
             os.system('sudo apt-get autoremove -y')
             bot.sendMessage(chat_id_owner, 'Autoremove done.\nStarting reboot...\nSee U soon')
             # os.system('sudo reboot now')
+
+        # Control Raspberry
         elif command == '/reboot':
             bot.sendMessage(chat_id_owner, 'See U soon')
             os.system('sudo reboot now')
+        elif command == '/shutdown':
+            bot.sendMessage(chat_id_owner, 'Seen U soon')
+            os.system('sudo shutdown now')
+
+        # Commands for testing bot and components + help
+        elif command == '/test':
+            bot.sendMessage(chat_id_owner, 'test')
+        elif command == '/fan_on':
+            fan.on()
+        elif command == '/fan_off':
+            fan.off()
+        elif command == '/update_on':
+            weekly_update.on()
+        elif command == '/update_off':
+            weekly_update.off()
+        elif command == '/help_test':
+            bot.sendMessage(chat_id_owner,
+                            "/fan_on - /fan_off - Test the fan\n"
+                            "/update_on - /update_off - Test LED update\n"
+                            "/test - Is bot actived ?")
         elif command == '/help':
             bot.sendMessage(chat_id_owner,
                             "/temp - Get temperature\n"
@@ -66,32 +106,10 @@ def handle(msg):
                             '/lcd_on - As excepted\n'
                             '/lcd_off - As excepted\n'
                             "/help - A little reminder")
-        elif command == '/test':
-            bot.sendMessage(chat_id_owner, 'test')
-        elif command == '/shutdown':
-            bot.sendMessage(chat_id_owner, 'Seen U soon')
-            os.system('sudo shutdown now')
-        elif command == '/fan_on':
-            fan.on()
-        elif command == '/fan_off':
-            fan.off()
-        elif command == '/update_on':
-            weekly_update.on()
-        elif command == '/update_off':
-            weekly_update.off()
-        elif command == '/lcd_off':
-            display.lcd_backlight(0)
-            bot.sendMessage(chat_id_owner, "LCD OFF")
-        elif command == '/lcd_on':
-            display.lcd_backlight(1)
-            bot.sendMessage(chat_id_owner, "LCD ON")
-        elif command == '/help_test':
-            bot.sendMessage(chat_id_owner,
-                            "/fan_on - /fan_off - Test the fan\n"
-                            "/update_on - /update_off - Test LED update\n"
-                            "/test - Is bot actived ?")
         else:
             bot.sendMessage(chat_id_owner, "I don't understand... Try /help or /help_test")
+
+    # Avoid an intrusion
     else:
         bot.sendMessage(chat_id_input, f"You are not allowed, your ID is {str(chat_id_input)}.")
         bot.sendMessage(chat_id_owner, f"Someone trying to do something strange...\nID: {str(chat_id_input)}\n"
@@ -137,6 +155,7 @@ GPIO_PIN_UPDATE = 27  # LED update control
 fan = OutputDevice(GPIO_PIN_FAN)
 weekly_update = OutputDevice(GPIO_PIN_UPDATE)
 update_list = ['02:00', '02:30']
+session_state_backlight = {}  # On/off LCD backlight
 
 # Load the driver and set it to "display"
 # If you use something from the driver library use the "display." prefix first
@@ -180,6 +199,7 @@ sp = spotipy.Spotify(
                               scope='user-read-playback-state'))
 
 # Start LCD
+session_state_backlight['backlight'] = {'is_backlight': 1}
 display.lcd_clear()
 print('Success: LCD ON')
 display.lcd_display_string("  Hello  World  ", 1)
@@ -200,13 +220,13 @@ while True:
         temperature = ds18b20(temp_file[0])
         house_temp = str(temperature)
     else:
-        print(
-            "DS18B20 not detected")
+        print("DS18B20 not detected")
 
     if temp > ON_THRESHOLD and not fan.value:  # Warning hot temperature
         fan.on()
         bot.sendMessage(chat_id_owner, f"WARNING! Temperature too HOT! {cpu[0:4]}°C")
-    if temp > SHUTDOWN_THRESHOLD:  # Alert too hot temperature  + shutdown
+    elif temp > SHUTDOWN_THRESHOLD:  # Alert too hot temperature  + shutdown
+        fan.on()
         bot.sendMessage(chat_id_owner, f"ALERT! CRITICAL TEMPERATURE! {cpu[0:4]}°C ! SHUTDOWN !")
         os.system('sudo shutdown now')
     elif temp < OFF_THRESHOLD and fan.value:  # Temperature under control
@@ -226,7 +246,7 @@ while True:
         bot.sendMessage(chat_id_owner, 'Weekly update done.\nStarting weekly upgrade...')
         os.system('sudo apt-get upgrade -y')
         bot.sendMessage(chat_id_owner, 'Weekly upgrade done')
-    if date == '1' and hour == '02:00' and not weekly_update.value:  # Major update
+    elif date == '1' and hour == '02:00' and not weekly_update.value:  # Major update
         weekly_update.on()
         bot.sendMessage(chat_id_owner, 'Starting monthly update...')
         os.system('sudo apt-get update -y')
@@ -252,11 +272,22 @@ while True:
         pause = 1
 
     # Display on LCD
+    if session_state_backlight['backlight']['is_backlight'] == 1:  # LCD backlight ON (default)
+        display.lcd_backlight(1)
+    elif session_state_backlight['backlight']['is_backlight'] == 0:  # LCD backlight OFF
+        display.lcd_backlight(0)
+
+    display.lcd_clear()  # Avoid having residual characters
     display.lcd_display_string(str(strftime("%a %d.%m  %H:%M")), 1)  # Line 1
+
     if pause == 1:
         display.lcd_display_extended_string(' {0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)  # Line 2
+        sleep(5)
     else:
-        if len(music) > 16:  # If track + name are longer than lcd (16 blocs), scroll it !
+        display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
+        sleep(1)
+
+        if len(music) > 16:  # If music are longer than lcd (16 blocs), scroll it !
             display.lcd_display_extended_string('{0x02}' + music[:16], 2)
             for i in range(len(music) - 15):
                 display.lcd_display_extended_string('{0x02}' + music[i:i + 16], 2)
@@ -264,4 +295,5 @@ while True:
         else:
             display.lcd_display_extended_string('{0x02}' + '{:^16}'.format(music), 2)
 
-    sleep(5)
+        display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
+        sleep(1)
