@@ -274,26 +274,28 @@ while True:
     # Display on LCD
     if session_state_backlight['backlight']['is_backlight'] == 1:  # LCD backlight ON (default)
         display.lcd_backlight(1)
+
+        display.lcd_clear()  # Avoid having residual characters
+        display.lcd_display_string(str(strftime("%a %d.%m  %H:%M")), 1)  # Line 1
+
+        if pause == 1:
+            display.lcd_display_extended_string(' {0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)  # Line 2
+            sleep(5)
+        else:
+            display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
+            sleep(1)
+
+            if len(music) > 16:  # If music are longer than lcd (16 blocs), scroll it !
+                display.lcd_display_extended_string('{0x02}' + music[:16], 2)
+                for i in range(len(music) - 15):
+                    display.lcd_display_extended_string('{0x02}' + music[i:i + 16], 2)
+                    sleep(0.5)
+            else:
+                display.lcd_display_extended_string('{0x02}' + '{:^16}'.format(music), 2)
+
+            display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
+            sleep(1)
+
     elif session_state_backlight['backlight']['is_backlight'] == 0:  # LCD backlight OFF
         display.lcd_backlight(0)
-
-    display.lcd_clear()  # Avoid having residual characters
-    display.lcd_display_string(str(strftime("%a %d.%m  %H:%M")), 1)  # Line 1
-
-    if pause == 1:
-        display.lcd_display_extended_string(' {0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)  # Line 2
-        sleep(5)
-    else:
-        display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
-        sleep(1)
-
-        if len(music) > 16:  # If music are longer than lcd (16 blocs), scroll it !
-            display.lcd_display_extended_string('{0x02}' + music[:16], 2)
-            for i in range(len(music) - 15):
-                display.lcd_display_extended_string('{0x02}' + music[i:i + 16], 2)
-                sleep(0.5)
-        else:
-            display.lcd_display_extended_string('{0x02}' + '{:^16}'.format(music), 2)
-
-        display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
         sleep(1)
