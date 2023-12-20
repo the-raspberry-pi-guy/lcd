@@ -9,6 +9,7 @@ from datetime import datetime
 from time import sleep
 from time import strftime
 
+import requests
 import spotipy
 import telepot
 from gpiozero import CPUTemperature
@@ -33,6 +34,21 @@ def ds18b20(temp_file):
 # Session state backlight
 def backlight(value):
     session_state_backlight['backlight'] = {'is_backlight': value}
+
+
+# Movie information
+def extract_movie_info(response):
+    movie_title = response['movie']['title']
+    movie_year = response['movie']['year']
+    return f"{movie_title} ({movie_year})"
+
+
+# Show information
+def extract_episode_info(response):
+    show_title = response['show']['title']
+    season_number = response['episode']['season']
+    episode_number = response['episode']['number']
+    return f"{show_title} S{season_number}E{episode_number}"
 
 
 # Commands from Telegram Bot
@@ -144,6 +160,9 @@ while True:
     except subprocess.CalledProcessError as e:
         print(f'Error during execution: {e}')
 
+TRAKT_USERNAME = secrets['TRAKT_USERNAME']
+TRAKT_CLIENT_ID = secrets['TRAKT_CLIENT_ID']
+
 ON_THRESHOLD = secrets["ON_THRESHOLD"]
 OFF_THRESHOLD = secrets['OFF_THRESHOLD']
 SHUTDOWN_THRESHOLD = secrets['SHUTDOWN_THRESHOLD']
@@ -190,6 +209,15 @@ cc.char_3_data = ["00011",  # Music 0x02
                   "01011",
                   "11011",
                   "11000"]
+
+cc.char_4_data = ["00000",  # Movie/Show 0x03
+                  "11101",
+                  "10111",
+                  "11111",
+                  "11101",
+                  "01000",
+                  "10100",
+                  "10010"]
 
 cc.load_custom_characters_data()  # Load custom characters for LCD
 
@@ -262,14 +290,33 @@ while True:
     # Retrieve now playing on Spotify
     current_track = sp.current_playback()
     if current_track is not None and 'is_playing' in current_track and not current_track['is_playing']:
-        pause = 1
+        spotify = 0
     elif current_track is not None and 'item' in current_track:
-        pause = 0
+        spotify = 1
         track_name = current_track['item']['name']
         artists = ', '.join([artist['name'] for artist in current_track['item']['artists']])
         music = f"{track_name}-{artists}"
     else:
-        pause = 1
+        spotify = 0
+
+    # Retrieve now playing movie or show from Trakt
+    # Settings to Trakt API
+    current_movieshow = f'https://api.trakt.tv/users/{TRAKT_USERNAME}/watching'
+    headers_movieshow = {
+        'Content-Type': 'application/json',
+        'trakt-api-version': '2',
+        'trakt-api-key': TRAKT_CLIENT_ID
+    }
+    try:
+        activity_response = requests.get(current_movieshow, headers=headers_movieshow)
+        response = json.loads(activity_response.text)
+        if response['type'] == 'movie':
+            trakt_playing = extract_movie_info(response)
+        elif response['type'] == 'episode':
+            trakt_playing = extract_episode_info(response)
+        trakt = 1
+    except Exception as e:
+        trakt = 0
 
     # Display on LCD
     if session_state_backlight['backlight']['is_backlight'] == 1:  # LCD backlight ON (default)
@@ -278,10 +325,10 @@ while True:
         display.lcd_clear()  # Avoid having residual characters
         display.lcd_display_string(str(strftime("%a %d.%m  %H:%M")), 1)  # Line 1
 
-        if pause == 1:
+        if spotify == 0 and trakt == 0:
             display.lcd_display_extended_string(' {0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)  # Line 2
-            sleep(5)
-        else:
+            sleep(1)
+        elif spotify == 1 and trakt == 0:
             display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
             sleep(1)
 
@@ -290,10 +337,28 @@ while True:
                 for i in range(len(music) - 15):
                     display.lcd_display_extended_string('{0x02}' + music[i:i + 16], 2)
                     sleep(0.5)
+                sleep(0.5)
             else:
                 display.lcd_display_extended_string('{0x02}' + '{:^16}'.format(music), 2)
+                sleep(1)
 
             display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
+            sleep(1)
+        elif trakt == 1:  # Movie/Show prior to music
+            display.lcd_display_extended_string('{0x03}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
+            sleep(1)
+
+            if len(trakt_playing) > 15:  # If music are longer than lcd (16 blocs), scroll it !
+                display.lcd_display_extended_string('{0x03}' + trakt_playing[:15], 2)
+                for i in range(len(trakt_playing) - 14):
+                    display.lcd_display_extended_string('{0x03}' + trakt_playing[i:i + 15], 2)
+                    sleep(0.5)
+                sleep(0.5)
+            else:
+                display.lcd_display_extended_string('{0x03}' + '{:^15}'.format(trakt_playing), 2)
+                sleep(1)
+
+            display.lcd_display_extended_string('{0x03}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
             sleep(1)
 
     elif session_state_backlight['backlight']['is_backlight'] == 0:  # LCD backlight OFF
