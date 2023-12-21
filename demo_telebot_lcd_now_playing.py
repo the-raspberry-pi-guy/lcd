@@ -21,6 +21,31 @@ from telepot.loop import MessageLoop
 import drivers
 
 
+# Retrieve ambient, CPU temperatures and gestion control
+def get_temp(temp_file):
+    cpu = CPUTemperature()
+    temp = cpu.temperature
+    cpu = str(temp)
+    if len(temp_file) > 0:
+        temperature = ds18b20(temp_file[0])
+        house_temp = str(temperature)
+    else:
+        print("DS18B20 not detected")
+
+    if temp > ON_THRESHOLD and not fan.value:  # Warning hot temperature
+        fan.on()
+        bot.sendMessage(chat_id_owner, f"WARNING! Temperature too HOT! {cpu[0:4]}°C")
+    elif temp > SHUTDOWN_THRESHOLD:  # Alert too hot temperature  + shutdown
+        fan.on()
+        bot.sendMessage(chat_id_owner, f"ALERT! CRITICAL TEMPERATURE! {cpu[0:4]}°C ! SHUTDOWN !")
+        os.system('sudo shutdown now')
+    elif temp < OFF_THRESHOLD and fan.value:  # Temperature under control
+        fan.off()
+        bot.sendMessage(chat_id_owner, f"Temperature under control. {cpu[0:4]}°C. Good job !")
+
+    return cpu, house_temp
+
+
 # House temperature
 def ds18b20(temp_file):
     temp_file = open(temp_file)
@@ -31,24 +56,109 @@ def ds18b20(temp_file):
     return float(temp_output[2:]) / 1000
 
 
+# Retrieve date, time and gestion control
+def get_date():
+    # For auto update
+    datetime = datetime.now()
+    day = datetime.weekday()
+    hour = strftime("%H:%M")
+    date = strftime("%d")
+
+    if day == 0 and hour == '02:30' and not weekly_update.value:  # Little update
+        weekly_update.on()
+        bot.sendMessage(chat_id_owner, 'Starting weekly update...')
+        os.system('sudo apt-get update -y')
+        bot.sendMessage(chat_id_owner, 'Weekly update done.\nStarting weekly upgrade...')
+        os.system('sudo apt-get upgrade -y')
+        bot.sendMessage(chat_id_owner, 'Weekly upgrade done')
+    elif date == '1' and hour == '02:00' and not weekly_update.value:  # Major update
+        weekly_update.on()
+        bot.sendMessage(chat_id_owner, 'Starting monthly update...')
+        os.system('sudo apt-get update -y')
+        bot.sendMessage(chat_id_owner, 'Monthly update done.\nStarting monthly upgrade...')
+        os.system('sudo apt-get upgrade -y')
+        bot.sendMessage(chat_id_owner, 'Monthly upgrade done.\nStarting monthly autoremove...')
+        os.system('sudo apt-get autoremove -y')
+        bot.sendMessage(chat_id_owner, 'Monthly autoremove done.\nStarting reboot...\nSee U soon')
+        # os.system('sudo reboot now')
+    elif hour not in update_list and weekly_update.value:
+        weekly_update.off()
+
+    # For LCD
+    LCD_date = str(strftime("%a %d.%m  %H:%M"))
+    return LCD_date
+
+
+# Spotify now playing
+def get_spotify_now_playing(sp):
+    current_track = sp.current_playback()
+    if current_track is not None and 'is_playing' in current_track and not current_track['is_playing']:
+        is_playing = 0
+        music = '0'
+    elif current_track is not None and 'item' in current_track:
+        is_playing = 1
+        track_name = current_track['item']['name']
+        artists = ', '.join([artist['name'] for artist in current_track['item']['artists']])
+        music = f"{track_name}-{artists}"
+    else:
+        is_playing = 0
+        music = '0'
+
+    return is_playing, music
+
+
+# Trakt now playing
+def get_trakt_now_playing():
+    # Settings for Trakt API
+    url = f'https://api.trakt.tv/users/{TRAKT_USERNAME}/watching'
+    headers = {
+        'Content-Type': 'application/json',
+        'trakt-api-version': '2',
+        'trakt-api-key': TRAKT_CLIENT_ID
+    }
+
+    # Retrieve now playing movie or show from Trakt
+    try:
+        activity_response = requests.get(url, headers=headers)
+        response = json.loads(activity_response.text)
+        if response['type'] == 'movie':
+            movie_title = response['movie']['title']
+            movie_year = response['movie']['year']
+            trakt_playing = f"{movie_title} ({movie_year})"
+        elif response['type'] == 'episode':
+            show_title = response['show']['title']
+            season_number = response['episode']['season']
+            episode_number = response['episode']['number']
+            trakt_playing = f"{show_title} S{season_number}E{episode_number}"
+        is_playing = 1
+    except Exception as e:
+        is_playing = 0
+        trakt_playing = '0'
+
+    return is_playing, trakt_playing
+
+
+# Display media on LCD
+def display_media(media, media_type):
+    if media_type == 'spotify':
+        cc = '{0x02}'
+    elif media_type == 'trakt':
+        cc = '{0x03}'
+
+    if len(media) > 15:  # If media is longer than LCD (16 blocs), scroll it !
+        display.lcd_display_extended_string(cc + media[:15], 2)
+        for i in range(len(media) - 14):
+            display.lcd_display_extended_string(cc + media[i:i + 15], 2)
+            sleep(0.5)
+        sleep(0.5)
+    else:
+        display.lcd_display_extended_string(cc + '{:^15}'.format(media), 2)
+        sleep(1)
+
+
 # Session state backlight
 def backlight(value):
     session_state_backlight['backlight'] = {'is_backlight': value}
-
-
-# Movie information
-def extract_movie_info(response):
-    movie_title = response['movie']['title']
-    movie_year = response['movie']['year']
-    return f"{movie_title} ({movie_year})"
-
-
-# Show information
-def extract_episode_info(response):
-    show_title = response['show']['title']
-    season_number = response['episode']['season']
-    episode_number = response['episode']['number']
-    return f"{show_title} S{season_number}E{episode_number}"
 
 
 # Commands from Telegram Bot
@@ -167,7 +277,7 @@ ON_THRESHOLD = secrets["ON_THRESHOLD"]
 OFF_THRESHOLD = secrets['OFF_THRESHOLD']
 SHUTDOWN_THRESHOLD = secrets['SHUTDOWN_THRESHOLD']
 
-temp_file = glob.glob("/sys/bus/w1/devices/28*/w1_slave")  # File location for ambient temp from D18B20
+temp_file = glob.glob("/sys/bus/w1/devices/28*/w1_slave")  # File location for ambient temp from DS18B20
 GPIO_PIN_FAN = 17  # Fan control
 GPIO_PIN_UPDATE = 27  # LED update control
 
@@ -240,124 +350,29 @@ bot.sendMessage(chat_id_owner, 'Hello World 😊')
 
 # Loop for LCD
 while True:
-    # Retrieve ambient and CPU temperatures and gestion
-    cpu = CPUTemperature()
-    temp = cpu.temperature
-    cpu = str(temp)
-    if len(temp_file) > 0:
-        temperature = ds18b20(temp_file[0])
-        house_temp = str(temperature)
-    else:
-        print("DS18B20 not detected")
 
-    if temp > ON_THRESHOLD and not fan.value:  # Warning hot temperature
-        fan.on()
-        bot.sendMessage(chat_id_owner, f"WARNING! Temperature too HOT! {cpu[0:4]}°C")
-    elif temp > SHUTDOWN_THRESHOLD:  # Alert too hot temperature  + shutdown
-        fan.on()
-        bot.sendMessage(chat_id_owner, f"ALERT! CRITICAL TEMPERATURE! {cpu[0:4]}°C ! SHUTDOWN !")
-        os.system('sudo shutdown now')
-    elif temp < OFF_THRESHOLD and fan.value:  # Temperature under control
-        fan.off()
-        bot.sendMessage(chat_id_owner, f"Temperature under control. {cpu[0:4]}°C. Good job !")
-
-    # Retrieve date and time
-    now = datetime.now()
-    hour = now.strftime("%H:%M")
-    date = now.strftime("%d")
-    day = now.weekday()
-
-    if day == 0 and hour == '02:30' and not weekly_update.value:  # Little update
-        weekly_update.on()
-        bot.sendMessage(chat_id_owner, 'Starting weekly update...')
-        os.system('sudo apt-get update -y')
-        bot.sendMessage(chat_id_owner, 'Weekly update done.\nStarting weekly upgrade...')
-        os.system('sudo apt-get upgrade -y')
-        bot.sendMessage(chat_id_owner, 'Weekly upgrade done')
-    elif date == '1' and hour == '02:00' and not weekly_update.value:  # Major update
-        weekly_update.on()
-        bot.sendMessage(chat_id_owner, 'Starting monthly update...')
-        os.system('sudo apt-get update -y')
-        bot.sendMessage(chat_id_owner, 'Monthly update done.\nStarting monthly upgrade...')
-        os.system('sudo apt-get upgrade -y')
-        bot.sendMessage(chat_id_owner, 'Monthly upgrade done.\nStarting monthly autoremove...')
-        os.system('sudo apt-get autoremove -y')
-        bot.sendMessage(chat_id_owner, 'Monthly autoremove done.\nStarting reboot...\nSee U soon')
-        # os.system('sudo reboot now')
-    elif hour not in update_list and weekly_update.value:
-        weekly_update.off()
-
-    # Retrieve now playing on Spotify
-    current_track = sp.current_playback()
-    if current_track is not None and 'is_playing' in current_track and not current_track['is_playing']:
-        spotify = 0
-    elif current_track is not None and 'item' in current_track:
-        spotify = 1
-        track_name = current_track['item']['name']
-        artists = ', '.join([artist['name'] for artist in current_track['item']['artists']])
-        music = f"{track_name}-{artists}"
-    else:
-        spotify = 0
-
-    # Retrieve now playing movie or show from Trakt
-    # Settings to Trakt API
-    current_movieshow = f'https://api.trakt.tv/users/{TRAKT_USERNAME}/watching'
-    headers_movieshow = {
-        'Content-Type': 'application/json',
-        'trakt-api-version': '2',
-        'trakt-api-key': TRAKT_CLIENT_ID
-    }
-    try:
-        activity_response = requests.get(current_movieshow, headers=headers_movieshow)
-        response = json.loads(activity_response.text)
-        if response['type'] == 'movie':
-            trakt_playing = extract_movie_info(response)
-        elif response['type'] == 'episode':
-            trakt_playing = extract_episode_info(response)
-        trakt = 1
-    except Exception as e:
-        trakt = 0
+    cpu, house_temp = get_temp(temp_file)
+    LCD_date = get_date()
+    is_playing_music, music = get_spotify_now_playing(sp)
+    is_playing_trakt, trakt_playing = get_trakt_now_playing()
 
     # Display on LCD
     if session_state_backlight['backlight']['is_backlight'] == 1:  # LCD backlight ON (default)
         display.lcd_backlight(1)
 
         display.lcd_clear()  # Avoid having residual characters
-        display.lcd_display_string(str(strftime("%a %d.%m  %H:%M")), 1)  # Line 1
+        display.lcd_display_string(LCD_date, 1)  # Line 1
 
-        if spotify == 0 and trakt == 0:
+        if is_playing_music == 0 and is_playing_trakt == 0:
             display.lcd_display_extended_string(' {0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)  # Line 2
             sleep(1)
-        elif spotify == 1 and trakt == 0:
+        elif is_playing_music == 1 and is_playing_trakt == 0:
+            display_media(music, media_type='spotify')
             display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
             sleep(1)
 
-            if len(music) > 16:  # If music are longer than lcd (16 blocs), scroll it !
-                display.lcd_display_extended_string('{0x02}' + music[:16], 2)
-                for i in range(len(music) - 15):
-                    display.lcd_display_extended_string('{0x02}' + music[i:i + 16], 2)
-                    sleep(0.5)
-                sleep(0.5)
-            else:
-                display.lcd_display_extended_string('{0x02}' + '{:^16}'.format(music), 2)
-                sleep(1)
-
-            display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
-            sleep(1)
-        elif trakt == 1:  # Movie/Show prior to music
-            display.lcd_display_extended_string('{0x03}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
-            sleep(1)
-
-            if len(trakt_playing) > 15:  # If music are longer than lcd (16 blocs), scroll it !
-                display.lcd_display_extended_string('{0x03}' + trakt_playing[:15], 2)
-                for i in range(len(trakt_playing) - 14):
-                    display.lcd_display_extended_string('{0x03}' + trakt_playing[i:i + 15], 2)
-                    sleep(0.5)
-                sleep(0.5)
-            else:
-                display.lcd_display_extended_string('{0x03}' + '{:^15}'.format(trakt_playing), 2)
-                sleep(1)
-
+        elif is_playing_trakt == 1:  # Movie/Show prior to music
+            display_media(trakt_playing, media_type='trakt')
             display.lcd_display_extended_string('{0x03}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
             sleep(1)
 
