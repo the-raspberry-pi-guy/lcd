@@ -59,8 +59,8 @@ def ds18b20(temp_file):
 # Retrieve date, time and gestion control
 def get_date():
     # For auto update
-    datetime = datetime.now()
-    day = datetime.weekday()
+    now = datetime.now()
+    day = now.weekday()
     hour = strftime("%H:%M")
     date = strftime("%d")
 
