@@ -91,18 +91,20 @@ def get_date():
 
 # Spotify now playing
 def get_spotify_now_playing(sp):
-    current_track = sp.current_playback()
-    if current_track is not None and 'is_playing' in current_track and not current_track['is_playing']:
+    try:
+        current_track = sp.current_playback()
+        if current_track.get('is_playing', False):
+            is_playing = 1
+            track_name = current_track['item']['name']
+            artists = ', '.join([artist['name'] for artist in current_track['item']['artists']])
+            music = f"{track_name}-{artists}"
+        else:
+            is_playing = 0
+            music = None
+    except Exception as e:
+        print(f"Error Spotify API: {e}")
         is_playing = 0
-        music = '0'
-    elif current_track is not None and 'item' in current_track:
-        is_playing = 1
-        track_name = current_track['item']['name']
-        artists = ', '.join([artist['name'] for artist in current_track['item']['artists']])
-        music = f"{track_name}-{artists}"
-    else:
-        is_playing = 0
-        music = '0'
+        music = None
 
     return is_playing, music
 
@@ -132,8 +134,9 @@ def get_trakt_now_playing():
             trakt_playing = f"{show_title} S{season_number}E{episode_number}"
         is_playing = 1
     except Exception as e:
+        print(f"Error Trakt API: {e}")
         is_playing = 0
-        trakt_playing = '0'
+        trakt_playing = None
 
     return is_playing, trakt_playing
 
