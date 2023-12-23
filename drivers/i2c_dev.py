@@ -50,6 +50,7 @@ LCD_5x8DOTS = 0x00
 # flags for backlight control
 LCD_BACKLIGHT = 0x08
 LCD_NOBACKLIGHT = 0x00
+SESSION_STATE_BACKLIGHT = ''
 
 En = 0b00000100  # Enable bit
 Rw = 0b00000010  # Read/Write bit
@@ -113,13 +114,21 @@ class Lcd:
 
     # clocks EN to latch command
     def lcd_strobe(self, data):
-        self.lcd.write_cmd(data | En | LCD_BACKLIGHT)
+        if SESSION_STATE_BACKLIGHT == 1:
+            LCD = LCD_BACKLIGHT
+        else:
+            LCD = LCD_NOBACKLIGHT
+        self.lcd.write_cmd(data | En | LCD)
         sleep(.0005)
-        self.lcd.write_cmd(((data & ~En) | LCD_BACKLIGHT))
+        self.lcd.write_cmd(((data & ~En) | LCD))
         sleep(.0001)
 
     def lcd_write_four_bits(self, data):
-        self.lcd.write_cmd(data | LCD_BACKLIGHT)
+        if SESSION_STATE_BACKLIGHT == 1:
+            LCD = LCD_BACKLIGHT
+        else:
+            LCD = LCD_NOBACKLIGHT
+        self.lcd.write_cmd(data | LCD)
         self.lcd_strobe(data)
 
     # write a command to lcd
@@ -170,11 +179,14 @@ class Lcd:
     # backlight control (on/off)
     # options: lcd_backlight(1) = ON, lcd_backlight(0) = OFF
     def lcd_backlight(self, state):
+        global SESSION_STATE_BACKLIGHT
         if state == 1:
             self.lcd.write_cmd(LCD_BACKLIGHT)
         elif state == 0:
             self.lcd.write_cmd(LCD_NOBACKLIGHT)
 
+        if state == 1 or state == 0:  # Save backlight settings
+            SESSION_STATE_BACKLIGHT = state
 class CustomCharacters:
     def __init__(self, lcd):
         self.lcd = lcd
