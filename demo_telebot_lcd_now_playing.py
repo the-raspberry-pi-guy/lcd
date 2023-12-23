@@ -93,7 +93,7 @@ def get_date():
 def get_spotify_now_playing(sp):
     try:
         current_track = sp.current_playback()
-        if current_track.get('is_playing', False):
+        if current_track and current_track.get('is_playing', False):
             is_playing = 1
             track_name = current_track['item']['name']
             artists = ', '.join([artist['name'] for artist in current_track['item']['artists']])
@@ -122,17 +122,26 @@ def get_trakt_now_playing():
     # Retrieve now playing movie or show from Trakt
     try:
         activity_response = requests.get(url, headers=headers)
-        response = json.loads(activity_response.text)
-        if response['type'] == 'movie':
-            movie_title = response['movie']['title']
-            movie_year = response['movie']['year']
-            trakt_playing = f"{movie_title} ({movie_year})"
-        elif response['type'] == 'episode':
-            show_title = response['show']['title']
-            season_number = response['episode']['season']
-            episode_number = response['episode']['number']
-            trakt_playing = f"{show_title} S{season_number}E{episode_number}"
-        is_playing = 1
+
+        # Check if the response status code is OK (200)
+        if activity_response.status_code == 200:
+            response = json.loads(activity_response.text)
+
+            if response['type'] == 'movie':
+                movie_title = response['movie']['title']
+                movie_year = response['movie']['year']
+                trakt_playing = f"{movie_title} ({movie_year})"
+            elif response['type'] == 'episode':
+                show_title = response['show']['title']
+                season_number = response['episode']['season']
+                episode_number = response['episode']['number']
+                trakt_playing = f"{show_title} S{season_number}E{episode_number}"
+            is_playing = 1
+        else:
+            print(f"Error Trakt API: Non-OK response status code {activity_response.status_code}")
+            is_playing = 0
+            trakt_playing = None
+
     except Exception as e:
         print(f"Error Trakt API: {e}")
         is_playing = 0
@@ -159,11 +168,6 @@ def display_media(media, media_type):
         sleep(1)
 
 
-# Session state backlight
-def backlight(value):
-    session_state_backlight['backlight'] = {'is_backlight': value}
-
-
 # Commands from Telegram Bot
 def handle(msg):
     chat_id_input = msg['chat']['id']
@@ -173,10 +177,10 @@ def handle(msg):
 
         # Command to ON/OFF LCD
         if command == '/lcd_off':
-            backlight(0)
+            display.lcd_backlight(0)
             bot.sendMessage(chat_id_owner, "LCD OFF")
         elif command == '/lcd_on':
-            backlight(1)
+            display.lcd_backlight(1)
             bot.sendMessage(chat_id_owner, "LCD ON")
 
         # Get temperature of CPU and DS18B20
@@ -287,7 +291,6 @@ GPIO_PIN_UPDATE = 27  # LED update control
 fan = OutputDevice(GPIO_PIN_FAN)
 weekly_update = OutputDevice(GPIO_PIN_UPDATE)
 update_list = ['02:00', '02:30']
-session_state_backlight = {}  # On/off LCD backlight
 
 # Load the driver and set it to "display"
 # If you use something from the driver library use the "display." prefix first
@@ -340,7 +343,7 @@ sp = spotipy.Spotify(
                               scope='user-read-playback-state'))
 
 # Start LCD
-session_state_backlight['backlight'] = {'is_backlight': 1}
+display.lcd_backlight(1)
 display.lcd_clear()
 print('Success: LCD ON')
 display.lcd_display_string("  Hello  World  ", 1)
@@ -360,25 +363,18 @@ while True:
     is_playing_trakt, trakt_playing = get_trakt_now_playing()
 
     # Display on LCD
-    if session_state_backlight['backlight']['is_backlight'] == 1:  # LCD backlight ON (default)
-        display.lcd_backlight(1)
+    display.lcd_clear()  # Avoid having residual characters
+    display.lcd_display_string(LCD_date, 1)  # Line 1
 
-        display.lcd_clear()  # Avoid having residual characters
-        display.lcd_display_string(LCD_date, 1)  # Line 1
+    if is_playing_music == 0 and is_playing_trakt == 0:
+        display.lcd_display_extended_string(' {0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)  # Line 2
+        sleep(1)
+    elif is_playing_music == 1 and is_playing_trakt == 0:
+        display_media(music, media_type='spotify')
+        display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
+        sleep(1)
 
-        if is_playing_music == 0 and is_playing_trakt == 0:
-            display.lcd_display_extended_string(' {0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)  # Line 2
-            sleep(1)
-        elif is_playing_music == 1 and is_playing_trakt == 0:
-            display_media(music, media_type='spotify')
-            display.lcd_display_extended_string('{0x02}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
-            sleep(1)
-
-        elif is_playing_trakt == 1:  # Movie/Show prior to music
-            display_media(trakt_playing, media_type='trakt')
-            display.lcd_display_extended_string('{0x03}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
-            sleep(1)
-
-    elif session_state_backlight['backlight']['is_backlight'] == 0:  # LCD backlight OFF
-        display.lcd_backlight(0)
+    elif is_playing_trakt == 1:  # Movie/Show prior to music
+        display_media(trakt_playing, media_type='trakt')
+        display.lcd_display_extended_string('{0x03}{0x00} ' + cpu[0:4] + '  {0x01} ' + house_temp[0:4], 2)
         sleep(1)
