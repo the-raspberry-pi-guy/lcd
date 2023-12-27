@@ -18,6 +18,7 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
    - [Custom characters](#custom-characters)
    - [Extended strings](#extended-strings)
    - [Forex](#forex)
+   - [Home automation](#home-automation)
    - [IP address](#ip-address)
    - [LCD demo](#lcd-demo)
    - [NetMonitor](#netmonitor)
@@ -160,6 +161,17 @@ To install the requirements, follow this procedure:
 
 <p align="center">
   <img src="imgs/demo_forex.gif" width="50%">
+</p>
+
+### Home Automation
+
+- Author: [@Jumitti](https://github.com/Jumitti)
+- Repository: [Jumitti/lcd_home_automation](https://github.com/Jumitti/lcd_home_automation)
+
+This implementation shows how to use the LCD to display messages from temperature sensors (see below) and services such as Spotify and Trakt. The implementation also features an integration with Telegram to turn the LCD backlight on/off and send a few other commands to control the host machine (e.g., get the temperature, reboot, shutdown). [@Jumitti](https://github.com/Jumitti) documented the project on its own [Home Automation repository](https://github.com/Jumitti/lcd_home_automation), so make sure to check it out if you want to learn more about it.
+
+<p align="center">
+  <img src="imgs/demo_home_automation.jpg" width="50%">
 </p>
 
 ### IP Address
