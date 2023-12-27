@@ -112,7 +112,7 @@ It is possible to define in CG RAM memory up to 8 custom characters. These chara
   7. `{0x06}`
   8. `{0x07}`
 
-Please, see the comments and implementation in the [`demo_lcd_custom_characters.py`](demo_lcd_custom_characters.py) file for more details on how to use custom characters.
+Please, see the comments and implementation in the [`demo_lcd_custom_characters.py`](demo_lcd_custom_characters.py) file for more details on how to use custom characters. Thanks to [@Jumitti](https://github.com/Jumitti), there is also [a web app you can use to generate custom characters](https://custom-characters-for-lcd16x2.streamlit.app/) by drawing them on a matrix.
 
 <p align="center">
   <img src="imgs/demo_custom_characters.jpg" width="50%">
