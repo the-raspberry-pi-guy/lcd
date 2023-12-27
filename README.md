@@ -168,10 +168,10 @@ To install the requirements, follow this procedure:
 - Author: [@Jumitti](https://github.com/Jumitti)
 - Repository: [Jumitti/lcd_home_automation](https://github.com/Jumitti/lcd_home_automation)
 
-This implementation shows how to use the LCD to display messages from temperature sensors (see below) and services such as Spotify and Trakt. The implementation also features an integration with Telegram to turn the LCD backlight on/off and send a few other commands to control the host machine (e.g., get the temperature, reboot, shutdown). [@Jumitti](https://github.com/Jumitti) documented the project on its own [Home Automation repository](https://github.com/Jumitti/lcd_home_automation), so make sure to check it out if you want to learn more about it.
+This implementation shows how to use the LCD to display messages from temperature sensors and services such as Spotify and Trakt (see below). The implementation also features an integration with Telegram to turn the LCD backlight on/off and send a few other commands to control the host machine (e.g., get the temperature, reboot, shutdown). [@Jumitti](https://github.com/Jumitti) documented the project on its own [Home Automation repository](https://github.com/Jumitti/lcd_home_automation), so make sure to check it out if you want to learn more about it.
 
 <p align="center">
-  <img src="imgs/demo_home_automation.jpg" width="50%">
+  <img src="imgs/demo_home_automation.gif" width="50%">
 </p>
 
 ### IP Address
