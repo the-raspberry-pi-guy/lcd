@@ -17,7 +17,6 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
    - [Backlight control](#backlight-control)
    - [Custom characters](#custom-characters)
    - [Extended strings](#extended-strings)
-   - [Forex](#forex)
    - [Home automation](#home-automation)
    - [IP address](#ip-address)
    - [LCD demo](#lcd-demo)
@@ -143,24 +142,6 @@ display.lcd_display_extended_string("Symbol:{{0xEF}} data:{0}".format(5), 2)
 
 <p align="center">
   <img src="imgs/demo_extended_strings.jpg" width="50%">
-</p>
-
-### Forex
-
-- Author: [@bariskisir](https://github.com/bariskisir)
-- Additional Python package requirements: `pip`, `requests`, `bs4`
-
-To install the requirements, follow this procedure:
-
-- Install `pip` and use it to install the remaining packages
-
-    ```sh
-    sudo apt install python-pip
-    pip install requests bs4
-    ```
-
-<p align="center">
-  <img src="imgs/demo_forex.gif" width="50%">
 </p>
 
 ### Home Automation
