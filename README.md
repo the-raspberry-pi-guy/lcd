@@ -17,6 +17,7 @@ You can buy one of these great little I2C LCD on eBay or somewhere like [the Pi 
    - [Backlight control](#backlight-control)
    - [Custom characters](#custom-characters)
    - [Extended strings](#extended-strings)
+   - [Emulator](#emulator)
    - [Forex](#forex)
    - [Home automation](#home-automation)
    - [IP address](#ip-address)
@@ -117,6 +118,78 @@ Please, see the comments and implementation in the [`demo_lcd_custom_characters.
 
 <p align="center">
   <img src="imgs/demo_custom_characters.jpg" width="50%">
+</p>
+
+### Emulator
+
+- Author: [@Jumitti](https://github.com/Jumitti)
+- ``Tkinter`` Python package: standard library (on **WINDOWS**).
+  - If there is an error, how to install on **Debian/Ubuntu**:
+    ```bash
+    sudo apt update
+    sudo apt install python3-tk
+    ```
+    On **macOS**:
+    ```bash
+    brew install python-tk
+    ```
+
+Just a 16x2 LCD screen simulator using Tkinter, allowing for easy testing and visualization of LCD displays without physical hardware. This simulator helps in developing and debugging LCD-based projects directly from a computer.
+Especially if you don't have your Raspberry and LCD with you.
+
+Some nice features are in addition. You can change the title and size of the Tkinter window, change the font and the 
+font size, the color of the background and the text (the [Backlight control](#backlight-control) is reverse colors).
+
+The font size and [Custom characters](#custom-characters) adapt to the size of the Tkinter window.
+And because it is an emulator, if you wanted to add or remove columns and lines you can do it
+
+
+**How to use:**
+- ``import drivers`` => ``import emulators``
+- ``Lcd()`` => ``LcdEmulator()``
+- ``CustomCharacters`` => ``CustomCharactersEmulator()``
+
+Suggested beginning program:
+
+```Python
+import emulators
+
+display = emulators.LcdEmulator()
+cc = emulators.CustomCharactersEmulator(display)
+
+# Then the rest of your finest feats
+```
+
+All other functions are the same. **Please refer to [demo_emulator.py](demo_emulator.py)**
+
+**Personalization of your Tkinter window**
+
+- **Parameters for `LcdEmulator()`**
+```Python
+import emulators
+
+display = emulators.LcdEmulator(TITTLE_WINDOWS="Hello World",
+                                LCD_BACKGROUND="pale turquoise", LCD_FOREGROUND="orange",
+                                SESSION_STATE_BACKLIGHT=1,
+                                FONT="Arial", FONT_SIZE=50,
+                                COLUMNS=16, ROWS=2, CHAR_WIDTH=50)
+```
+
+| Parameter               | Type              | Default Value  | Description                                                                                                                                |
+|-------------------------|-------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `TITTLE_WINDOWS`        | `Union[str, int]` | `LCD 16x2 Emulator` | Renames the Tkinter window.                                                                                                                |
+| `LCD_BACKGROUND`        | `str`             | `green`        | Background color (supports HEX values, e.g., `#55A8DB`). [List of supported colors](https://www.tcl-lang.org/man/tcl8.4/TkCmd/colors.htm). |
+| `LCD_FOREGROUND`        | `str`             | `black`        | Foreground color (supports HEX values, e.g., `#55A8DB`). [List of supported colors](https://www.tcl-lang.org/man/tcl8.4/TkCmd/colors.htm). |
+| `SESSION_STATE_BACKLIGHT` | `int`             | `1`            | Controls the backlight. Set `1` for ON and `0` for OFF.                                                                                    |
+| `FONT`                  | `str`             | `Courier`      | Font family. [List of available fonts](https://stackoverflow.com/a/64301819).                                                              |
+| `FONT_SIZE`             | `int > 0`         | `75`           | The font size. The font size adapts to the window size to prevent overflow.                                                                |
+| `COLUMNS`               | `int > 0`         | `16`           | Number of columns (you can customize it beyond the standard 16x2 LCD screen configuration).                                                |
+| `ROWS`                  | `int > 0`         | `2`            | Number of rows (you can customize it beyond the standard 16x2 LCD screen configuration).                                                   |
+| `CHAR_WIDTH`            | `int > 0`         | `75`           | Resizes the Tkinter window accordingly.                                                                                                    |
+
+
+<p align="center">
+  <img src="imgs/demo_simulator.gif" width="50%">
 </p>
 
 ### Extended strings
