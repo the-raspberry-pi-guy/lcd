@@ -240,7 +240,7 @@ The script takes info from the following APIs:
 
 - [quotable.io](https://github.com/lukePeavey/quotable): Free public API that provides famous quotes from well known people. It has a public endpoint that doesn't require an API key.
 
-- [exchangerate-api.com](https://exchangerate-api.com) / [free.currencyconverterapi.com](https://free.currencyconverterapi.com): There are a lot of currency apis but these ones offer free currency exchange info. Both are used, one as main, the other as backup. Requires an API key to use.
+- [exchangerate-api.com](https://exchangerate-api.com) / [allratestoday.com](https://allratestoday.com/api/open/central-bank/ecb): There are a lot of currency apis but these ones offer free currency exchange info. Both are used, one as main, the other as backup. The first requires an API key; the second (official ECB reference rates) is keyless. (free.currencyconverterapi.com, previously listed here, has shut its free server down indefinitely.)
 
 - [openweathermap.org](https://openweathermap.org): Provides Weather info, forecasts, etc. Requires an API key to use.
 
